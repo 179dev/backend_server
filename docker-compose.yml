@@ -17,7 +17,7 @@ services:
     networks:
       - server_network
     ports:
-      - '8179:8179'
+      - '${OUTER_PORT}:${INNER_PORT}'
   
   database:
     image: postgres:latest

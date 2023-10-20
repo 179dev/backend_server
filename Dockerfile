@@ -21,4 +21,4 @@ COPY --from=requirements-stage /tmp/requirements.txt /server/requirements.txt
 
 RUN python3 -m pip install --no-cache-dir --upgrade -r /server/requirements.txt
 
-CMD ["uvicorn", "server.__main__:app", "--host", "0.0.0.0", "--port", "8179"]
+CMD ["bash", "/server/scripts/run_server.sh"]
