@@ -7,7 +7,7 @@ from server.database.schemas.users import UserCreate
 @dataclasses.dataclass
 class User:
     id: UUID
-    email: str = None
+    email: str
     hashed_password: str
     settings: str = "{}"
 
