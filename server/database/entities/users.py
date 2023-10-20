@@ -7,9 +7,9 @@ from server.database.schemas.users import UserCreate
 @dataclasses.dataclass
 class User:
     id: UUID
-    email: str
+    email: str = None
     hashed_password: str
-    settings: str
+    settings: str = "{}"
 
     @classmethod
     def create(cls, user: UserCreate):
