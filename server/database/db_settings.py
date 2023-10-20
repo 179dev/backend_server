@@ -11,7 +11,7 @@ POSTGRES_DB_NAME = os.getenv("POSTGRES_DB_NAME") or "postgres"
 POSTGRES_USERNAME = os.getenv("POSTGRES_USERNAME") or "postgres"
 POSTGRES_HOST = os.getenv("POSTGRES_HOST") or "localhost"
 POSTGRES_PORT = os.getenv("POSTGRES_PORT") or "5432"
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD") or "admin"
 
 DB_URL = (
     f"postgresql://"
