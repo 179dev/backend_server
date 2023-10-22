@@ -1,11 +1,11 @@
-from typing import Any
+from typing import Any, Callable
 
 
 class EntityLikeMixin:
     __common_fields_with_entity__: list[str]
     __entity__: Any
-    __attrs_to_entity__: dict[str, function]
-    __attrs_from_entity__: dict[str, function]
+    __attrs_to_entity__: dict[str, Callable]
+    __attrs_from_entity__: dict[str, Callable]
 
     @classmethod
     def from_entity(cls, entity):

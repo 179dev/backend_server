@@ -25,4 +25,4 @@ class User(Base, EntityLikeMixin):
     username: Mapped[str] = mapped_column(String(256), unique=True)
     display_name: Mapped[str] = mapped_column(String(256), nullable=True)
     hashed_password: Mapped[str] = mapped_column(String)
-    settings: Mapped[str] = mapped_column(String(1024))
+    settings: Mapped[str] = mapped_column(String(1024), default="{}")

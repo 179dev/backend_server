@@ -9,9 +9,9 @@ class User:
     id: UUID
     email: str
     hashed_password: str
-    settings: str = {}
     username: str
     display_name: str = None
+    settings: str = dataclasses.field(default_factory=dict)
 
     @classmethod
     def create(cls, user: UserCreate):
@@ -20,6 +20,7 @@ class User:
         new_user = cls(
             id=uuid4(),
             email=user.email,
+            username=user.username,
             hashed_password=hashed_password,
             settings={},
         )
