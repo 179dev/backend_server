@@ -9,7 +9,9 @@ class User:
     id: UUID
     email: str
     hashed_password: str
-    settings: str = "{}"
+    settings: str = {}
+    username: str
+    display_name: str = None
 
     @classmethod
     def create(cls, user: UserCreate):

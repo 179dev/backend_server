@@ -13,6 +13,8 @@ class User(Base, EntityLikeMixin):
         "id",
         "email",
         "hashed_password",
+        "username",
+        "display_name",
     )
     __entity__ = UserEntity
     __attrs_from_entity__ = {"settings": json.dumps}
@@ -20,5 +22,7 @@ class User(Base, EntityLikeMixin):
 
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, index=True)
     email: Mapped[str] = mapped_column(String(256), unique=True, index=True)
+    username: Mapped[str] = mapped_column(String(256), unique=True)
+    display_name: Mapped[str] = mapped_column(String(256), nullable=True)
     hashed_password: Mapped[str] = mapped_column(String)
     settings: Mapped[str] = mapped_column(String(1024))

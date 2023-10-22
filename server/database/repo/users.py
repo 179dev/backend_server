@@ -24,6 +24,14 @@ class UserRepoModule(BaseRepoModule):
         )
         return user and user.as_entity()
 
+    def get_by_username(self, ctx: DBContext, username: str):
+        user = (
+            ctx.session.query(users_models.User)
+            .filter(users_models.User.username == username)
+            .first()
+        )
+        return user and user.as_entity()
+
     def every(self, ctx: DBContext, skip: int = 0, limit: int = 100):
         return map(
             users_models.User.as_entity,
