@@ -1,6 +1,9 @@
 import os
 
-INNER_PORT = os.getenv("INNER_PORT") or "8179"
+INNER_PORT = os.getenv("INNER_PORT")
+
+if not INNER_PORT:
+    raise ValueError("Incomplete environment variables.")
 
 ALLOWED_ORIGINS = [
     "http://0.0.0.0",

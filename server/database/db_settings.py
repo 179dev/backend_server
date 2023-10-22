@@ -7,11 +7,20 @@ from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 
-POSTGRES_DB_NAME = os.getenv("POSTGRES_DB_NAME") or "postgres"
-POSTGRES_USERNAME = os.getenv("POSTGRES_USERNAME") or "postgres"
-POSTGRES_HOST = os.getenv("POSTGRES_HOST") or "localhost"
-POSTGRES_PORT = os.getenv("POSTGRES_PORT") or "5432"
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD") or "admin"
+POSTGRES_DB_NAME = os.getenv("POSTGRES_DB_NAME")
+POSTGRES_USERNAME = os.getenv("POSTGRES_USERNAME")
+POSTGRES_HOST = os.getenv("POSTGRES_HOST")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+
+if not (
+    POSTGRES_DB_NAME
+    and POSTGRES_USERNAME
+    and POSTGRES_HOST
+    and POSTGRES_PORT
+    and POSTGRES_PASSWORD
+):
+    raise ValueError("Incomplete environment variables.")
 
 DB_URL = (
     f"postgresql://"
