@@ -13,12 +13,12 @@ class User:
 
     @classmethod
     def create(cls, user: UserCreate):
-        hashed_password = user.password + "debug_not_really_hashed"
+        hashed_password = user.password + "debug_not_really_hashed"  # FIXME
 
         new_user = cls(
             id=uuid4(),
             email=user.email,
             hashed_password=hashed_password,
-            settings=user.settings,
+            settings={},
         )
         return new_user

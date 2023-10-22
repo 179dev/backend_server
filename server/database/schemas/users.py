@@ -6,7 +6,6 @@ class UserBase(BaseModel):
     """Common user data shared by all schemas"""
 
     email: str
-    settings: str
 
 
 class UserGet(UserBase):

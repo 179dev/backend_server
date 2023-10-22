@@ -4,6 +4,7 @@ from uuid import UUID
 from server.database.db_settings import Base
 from server.database.models.entity_like import EntityLikeMixin
 from server.database.entities.users import User as UserEntity
+import json
 
 
 class User(Base, EntityLikeMixin):
@@ -12,9 +13,10 @@ class User(Base, EntityLikeMixin):
         "id",
         "email",
         "hashed_password",
-        "settings",
     )
     __entity__ = UserEntity
+    __attrs_from_entity__ = {"settings": json.dumps}
+    __attrs_to_entity__ = {"settings": json.loads}
 
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, index=True)
     email: Mapped[str] = mapped_column(String(256), unique=True, index=True)
