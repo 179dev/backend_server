@@ -13,6 +13,7 @@ class UserGet(UserBase):
     """User data which can be read"""
 
     id: UUID
+    display_name: str
 
     class Config:
         orm_mode = True
