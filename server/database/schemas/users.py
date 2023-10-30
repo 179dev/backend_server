@@ -15,9 +15,6 @@ class UserGet(UserBase):
     id: UUID
     display_name: str | None
 
-   # class Config:
-   #     orm_mode = True
-
 
 class UserCreate(UserBase):
     """User data which can be written"""

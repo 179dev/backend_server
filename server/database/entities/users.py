@@ -21,7 +21,6 @@ class User:
             id=uuid4(),
             email=user.email,
             username=user.username,
-            
             hashed_password=hashed_password,
             settings={},
         )
