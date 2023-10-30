@@ -10,7 +10,7 @@ class User:
     email: str
     hashed_password: str
     username: str
-    display_name: str = None
+    display_name: str | None = None 
     settings: str = dataclasses.field(default_factory=dict)
 
     @classmethod
@@ -21,6 +21,7 @@ class User:
             id=uuid4(),
             email=user.email,
             username=user.username,
+            
             hashed_password=hashed_password,
             settings={},
         )

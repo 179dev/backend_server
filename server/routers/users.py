@@ -23,7 +23,9 @@ def create_user(user: UserCreate, db: DBContext = Depends(db_context)):
     db_user = main_repo.users.get_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
+    print(user)
     new_user = User.create(user)
+    print(new_user)
     return main_repo.users.insert(db, new_user)
 
 
