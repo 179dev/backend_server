@@ -13,10 +13,7 @@ class UserGet(UserBase):
     """User data which can be read"""
 
     id: UUID
-    display_name: str
-
-    class Config:
-        orm_mode = True
+    display_name: str | None
 
 
 class UserCreate(UserBase):
