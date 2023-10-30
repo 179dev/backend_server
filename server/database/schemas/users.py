@@ -23,6 +23,17 @@ class UserCreate(UserBase):
     """User data which can be written"""
 
     password: str
+    displayname: str
+
+    class Config:
+        orm_mode = True
+
+
+class UserLogin(UserBase):
+    """User data for logging in"""
+
+    login: str
+    password: str
 
     class Config:
         orm_mode = True

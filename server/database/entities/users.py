@@ -4,6 +4,10 @@ import dataclasses
 from server.database.schemas.users import UserCreate
 
 
+def hash_password(password: str):
+    return password + "debug_not_really_hashed"  # FIXME
+
+
 @dataclasses.dataclass
 class User:
     id: UUID
@@ -15,7 +19,7 @@ class User:
 
     @classmethod
     def create(cls, user: UserCreate):
-        hashed_password = user.password + "debug_not_really_hashed"  # FIXME
+        hashed_password = hash_password(user.password)
 
         new_user = cls(
             id=uuid4(),
