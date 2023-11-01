@@ -8,15 +8,6 @@ from server.config import *
 
 load_dotenv()
 
-if not (
-    POSTGRES_DB_NAME
-    and POSTGRES_USERNAME
-    and POSTGRES_HOST
-    and POSTGRES_PORT
-    and POSTGRES_PASSWORD
-):
-    raise ValueError("Incomplete environment variables.")
-
 DB_URL = (
     f"postgresql://"
     f"{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}"
