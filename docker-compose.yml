@@ -1,5 +1,6 @@
 services:
   server:
+    image: backend-server
     build: .
     env_file:
         - .env
@@ -11,7 +12,7 @@ services:
       - POSTGRES_DB_NAME=postgres
     depends_on:
       - database
-      # - migration
+      - migration
     extra_hosts:
         - "host.docker.internal:0.0.0.0"
     networks:
@@ -19,6 +20,17 @@ services:
     ports:
       - '${OUTER_PORT}:${INNER_PORT}'
   
+  migration:
+    image: backend-server
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      - database
+    command: bash -c "cd /server/server/database/migrations && alembic upgrade head && cd /server"
+    networks:
+      - server_network
+
   database:
     image: postgres:latest
     restart: always
