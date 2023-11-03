@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from uuid import UUID, uuid4
 import dataclasses
+from datetime import datetime
 from server.database.schemas.users import UserCreate
 
 
@@ -16,6 +17,8 @@ class User:
     username: str
     display_name: str = None
     settings: str = dataclasses.field(default_factory=dict)
+    token: str | None,
+    token_expiration_date: datetime | None
 
     @classmethod
     def create(cls, user: UserCreate):
@@ -27,5 +30,7 @@ class User:
             username=user.username,
             hashed_password=hashed_password,
             settings={},
+            token=None,
+            toxen_expire_date=None
         )
         return new_user

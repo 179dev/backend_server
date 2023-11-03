@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from server.routers import users
+from server.domains import users
 from server.database.db_settings import Base, engine
 from server.config import ALLOWED_ORIGINS
 

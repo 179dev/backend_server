@@ -8,7 +8,7 @@ from server.database.db_context import DBContext
 
 
 class UserRepoModule(BaseRepoModule):
-    def get_by_id(self, ctx: DBContext, user_id: UUID):
+    def get_by_id(self, ctx: DBContext, user_id: UUID) -> users_models.User:
         user = (
             ctx.session.query(users_models.User)
             .filter(users_models.User.id == user_id)
@@ -16,7 +16,7 @@ class UserRepoModule(BaseRepoModule):
         )
         return user and user.as_entity()
 
-    def get_by_email(self, ctx: DBContext, email: str):
+    def get_by_email(self, ctx: DBContext, email: str) -> users_models.User:
         user = (
             ctx.session.query(users_models.User)
             .filter(users_models.User.email == email)
@@ -24,21 +24,26 @@ class UserRepoModule(BaseRepoModule):
         )
         return user and user.as_entity()
 
-    def get_by_username(self, ctx: DBContext, username: str):
+    def get_by_username(self, ctx: DBContext, username: str) -> users_models.User:
         user = (
             ctx.session.query(users_models.User)
             .filter(users_models.User.username == username)
-            .first()
+            .first(users_models.User)
         )
         return user and user.as_entity()
+
+    def get_by_token(self, ctx: DBContext, token: str) -> users_models.User:
+        user = (
+            ctx.session.query(users_models.User)
+            .filter(users_models.User.token == token)
+            .first(users_models.User)
+        )
+        return user
 
     def every(self, ctx: DBContext, skip: int = 0, limit: int = 100):
         return map(
             users_models.User.as_entity,
-            ctx.session.query(users_models.User)
-            .offset(skip)
-            .limit(limit)
-            .all(),
+            ctx.session.query(users_models.User).offset(skip).limit(limit).all(),
         )
 
     def insert(self, ctx: DBContext, user: users_entities.User):

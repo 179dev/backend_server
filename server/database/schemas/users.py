@@ -29,6 +29,15 @@ class UserCreate(UserBase):
         orm_mode = True
 
 
+class UserAuth(UserBase):
+    """User data for authentification"""
+
+    token: str
+
+    class Config:
+        orm_mode = True
+
+
 class UserLogin(UserBase):
     """User data for logging in"""
 
