@@ -1,5 +1,10 @@
 import os
 
+# Global constants
+CANVAS_WIDTH = 2048
+CANVAS_HEIGHT = 2048
+
+# Env variables
 INNER_PORT = os.getenv("INNER_PORT")
 POSTGRES_DB_NAME = os.getenv("POSTGRES_DB_NAME")
 POSTGRES_USERNAME = os.getenv("POSTGRES_USERNAME")
