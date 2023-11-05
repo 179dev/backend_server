@@ -1,13 +1,12 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
-from canvas.canvas_session import CanvasSession
-from config import INNER_PORT
+from server.canvas.canvas_session import CanvasSession
+from server.config import INNER_PORT
 
 router = APIRouter()
 
-ws_debug_test_page = (
-    """
+ws_debug_test_page = """
 <!DOCTYPE html>
 <html>
     <head>
@@ -23,11 +22,9 @@ ws_debug_test_page = (
         <ul id='messages'>
         </ul>
         <script>
-            var client_id = Date.now()
+            var client_id = 179
             document.querySelector("#ws-id").textContent = client_id;
-            var ws = new WebSocket(`ws://localhost:"""
-    + str(INNER_PORT)
-    + """/canvas/${client_id}`);
+            var ws = new WebSocket(`ws://localhost:8179/ws/canvas/${client_id}`);
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages')
                 var message = document.createElement('li')
@@ -45,21 +42,19 @@ ws_debug_test_page = (
     </body>
 </html>
 """
-)
 
 canvases = {}
 
 
-@router.get("/canvas/{canvas_id}/")
+@router.get("/canvas/{canvas_id}")
 async def get():
     return HTMLResponse(ws_debug_test_page)
 
 
-@router.websocket("/canvas/{canvas_id}/")
+@router.websocket("/ws/canvas/{canvas_id}")
 async def websocket_endpoint(canvas_id: int, websocket: WebSocket):
     if canvas_id not in canvases:
         canvases[canvas_id] = CanvasSession(canvas_id)
-
     await canvases[canvas_id].connect(websocket)
     try:
         while True:
