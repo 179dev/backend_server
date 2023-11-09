@@ -30,4 +30,4 @@ class User(Base, EntityLikeMixin):
     hashed_password: Mapped[str] = mapped_column(String)
     settings: Mapped[str] = mapped_column(String(1024), default="{}")
     token: Mapped[str] = mapped_column(String, unique=True, nullable=True)
-    token_expiration_date: Mapped[DateTime] = mapped_column(DateTime)
+    token_expiration_date: Mapped[DateTime] = mapped_column(DateTime, nullable=True)

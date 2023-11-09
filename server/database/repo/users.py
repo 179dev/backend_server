@@ -28,7 +28,7 @@ class UserRepoModule(BaseRepoModule):
         user = (
             ctx.session.query(users_models.User)
             .filter(users_models.User.username == username)
-            .first(users_models.User)
+            .first()
         )
         return user and user.as_entity()
 
@@ -36,7 +36,7 @@ class UserRepoModule(BaseRepoModule):
         user = (
             ctx.session.query(users_models.User)
             .filter(users_models.User.token == token)
-            .first(users_models.User)
+            .first()
         )
         return user
 

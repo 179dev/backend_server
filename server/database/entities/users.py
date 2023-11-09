@@ -31,6 +31,6 @@ class User:
             hashed_password=hashed_password,
             settings={},
             token=None,
-            toxen_expire_date=None,
+            token_expiration_date=None,
         )
         return new_user

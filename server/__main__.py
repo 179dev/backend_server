@@ -10,7 +10,9 @@ from server.config import ALLOWED_ORIGINS
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-app.include_router(users.router, login.router, registration.router)
+app.include_router(users.router)
+app.include_router(login.router)
+app.include_router(registration.router)
 
 
 app.add_middleware(
