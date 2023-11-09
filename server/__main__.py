@@ -2,10 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from server.routers import users
-from server.database.db_settings import Base, engine
+from server.database.db_settings import engine
+from server.database.models.base_model import BaseModel
 from server.config import ALLOWED_ORIGINS
 
-Base.metadata.create_all(bind=engine)
+BaseModel.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
