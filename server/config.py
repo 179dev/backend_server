@@ -32,6 +32,7 @@ ALLOWED_ORIGINS = [
 DB_URL = (
     f"postgresql://"
     f"{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}"
+    # f"{POSTGRES_USERNAME}"
     f"@{POSTGRES_HOST}:{POSTGRES_PORT}"
     f"/{POSTGRES_DB_NAME}"
 )
