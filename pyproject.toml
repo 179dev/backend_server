@@ -11,9 +11,8 @@ fastapi = "^0.104.0"
 uvicorn = "^0.23.2"
 sqlalchemy = "^2.0.22"
 python-dotenv = "^1.0.0"
-psycopg = "^3.1.12"
+psycopg2 = "^2.9.9"
 python-jose = "^3.3.0"
-
 
 [build-system]
 requires = ["poetry-core"]
