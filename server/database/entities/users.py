@@ -15,10 +15,10 @@ class User:
     email: str
     hashed_password: str
     username: str
-    display_name: str | None = None 
-    settings: str = dataclasses.field(default_factory=dict)
-    token: str | None,
+    token: str | None
     token_expiration_date: datetime | None
+    display_name: str | None = None
+    settings: str = dataclasses.field(default_factory=dict)
 
     @classmethod
     def create(cls, user: UserCreate):
@@ -31,6 +31,6 @@ class User:
             hashed_password=hashed_password,
             settings={},
             token=None,
-            toxen_expire_date=None
+            toxen_expire_date=None,
         )
         return new_user

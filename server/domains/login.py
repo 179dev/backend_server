@@ -8,7 +8,11 @@ from server.database.schemas.users import UserLogin, UserGet
 from server.database.entities.users import User
 from server.database.entities.users import hash_password
 from datetime import datetime
-from config import TOKEN_EXPIRE_TIME, TOKEN_GENERATION_ALGORITHM, TOKEN_SECRET_KEY
+from server.config import (
+    TOKEN_EXPIRE_TIME,
+    TOKEN_GENERATION_ALGORITHM,
+    TOKEN_SECRET_KEY,
+)
 from jose import jwt
 from server import main_repo
 
