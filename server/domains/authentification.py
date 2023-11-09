@@ -8,6 +8,7 @@ from server.database.schemas.users import UserAuth
 from server.database.entities.users import User
 from server.database.entities.users import hash_password
 from server import main_repo
+from datetime import datetime
 
 
 def db_context():
@@ -21,5 +22,7 @@ def db_context():
 def authenticate_user(user: UserAuth, db: DBContext = Depends(db_context)):
     db_user = main_repo.users.get_by_token(db, user.token)
     if not db_user:
+        raise HTTPException(status_code=401, detail="Authorization error")
+    if db_user.token_expiration_date < datetime.utcnow():
         raise HTTPException(status_code=401, detail="Authorization error")
     return db_user

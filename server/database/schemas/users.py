@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from uuid import UUID
+from datetime import datetime
 
 
 class UserBase(BaseModel):
@@ -33,6 +34,7 @@ class UserAuth(UserBase):
     """User data for authentification"""
 
     token: str
+    token_expiration_date: datetime | None = None
 
     class Config:
         orm_mode = True
@@ -43,6 +45,8 @@ class UserLogin(UserBase):
 
     login: str
     password: str
+    token: str | None = None
+    token_expiration_date: datetime | None = None
 
     class Config:
         orm_mode = True

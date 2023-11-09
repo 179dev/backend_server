@@ -7,6 +7,9 @@ from server.database.db_context import DBContext
 from server.database.schemas.users import UserLogin, UserGet
 from server.database.entities.users import User
 from server.database.entities.users import hash_password
+from datetime import datetime
+from config import TOKEN_EXPIRE_TIME, TOKEN_GENERATION_ALGORITHM, TOKEN_SECRET_KEY
+from jose import jwt
 from server import main_repo
 
 router = APIRouter()
@@ -18,6 +21,20 @@ def db_context():
         yield DBContext(db)
     finally:
         db.close()
+
+
+def generate_token(user: UserLogin, ctx: DBContext = Depends(db_context)):
+    token_expiration_date = datetime.utcnow() + TOKEN_EXPIRE_TIME
+    to_encode = {
+        "username": user.username,
+        "exp": token_expiration_date,
+    }
+    token = jwt.encode(
+        to_encode, key=TOKEN_SECRET_KEY, algorithm=TOKEN_GENERATION_ALGORITHM
+    )
+    user.token = token
+    user.token_expiration_date = token_expiration_date
+    return main_repo.users.insert(ctx, UserLogin)
 
 
 @router.post("/login/by_mail", response_model=UserGet)

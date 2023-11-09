@@ -40,10 +40,6 @@ class UserRepoModule(BaseRepoModule):
         )
         return user
 
-    def update_token(self, ctx: DBContext, user: users_entities.User):
-        db_user = users_models.User.from_entity(user)
-        # generate token
-
     def every(self, ctx: DBContext, skip: int = 0, limit: int = 100):
         return map(
             users_models.User.as_entity,
