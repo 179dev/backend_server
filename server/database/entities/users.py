@@ -29,6 +29,7 @@ class User:
             email=user.email,
             username=user.username,
             hashed_password=hashed_password,
+            display_name=user.display_name,
             settings={},
             token=None,
             token_expiration_date=None,

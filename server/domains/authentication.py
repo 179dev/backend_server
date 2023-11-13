@@ -21,8 +21,6 @@ def db_context():
 
 def authenticate_user(user: UserAuth, db: DBContext = Depends(db_context)):
     db_user = main_repo.users.get_by_token(db, user.token)
-    if not db_user:
-        raise HTTPException(status_code=401, detail="Authorization error")
-    if db_user.token_expiration_date < datetime.utcnow():
+    if not db_user or db_user.token_expiration_date < datetime.utcnow():
         raise HTTPException(status_code=401, detail="Authorization error")
     return db_user

@@ -6,22 +6,24 @@ from datetime import datetime
 class UserBase(BaseModel):
     """Common user data shared by all schemas"""
 
-    email: str
-    username: str
+    email: str | None = None
+    username: str | None = None
 
 
 class UserGet(UserBase):
     """User data which can be read"""
 
     id: UUID
-    display_name: str | None
+    token: str | None = None
+    token_expiration_date: datetime | None = None
+    display_name: str | None = None
 
 
 class UserCreate(UserBase):
     """User data which can be written"""
 
     password: str
-    displayname: str
+    display_name: str | None = None
 
     class Config:
         orm_mode = True
@@ -31,7 +33,7 @@ class UserAuth(UserBase):
     """User data for authentification"""
 
     token: str
-    token_expiration_date: datetime | None = None
+    token_expiration_date: datetime
 
     class Config:
         orm_mode = True
@@ -40,10 +42,7 @@ class UserAuth(UserBase):
 class UserLogin(UserBase):
     """User data for logging in"""
 
-    login: str
     password: str
-    token: str | None = None
-    token_expiration_date: datetime | None = None
 
     class Config:
         orm_mode = True

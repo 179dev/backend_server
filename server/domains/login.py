@@ -44,18 +44,16 @@ def generate_token(user: UserLogin, ctx: DBContext = Depends(db_context)):
 @router.post("/login/by_mail", response_model=UserGet)
 def login_by_mail(user: UserLogin, ctx: DBContext = Depends(db_context)):
     db_user = main_repo.users.get_by_email(ctx, email=user.email)
-    if db_user is None:
+    if db_user is None or db_user.hashed_password != hash_password(user.password):
         raise HTTPException(status_code=400, detail="Email or password is invalid")
-    if db_user.hashed_password != hash_password(user.password):
-        raise HTTPException(status_code=400, detail="Email or password is invalid")
+    db_user = generate_token(user, ctx)
     return db_user
 
 
 @router.post("/login/by_username", response_model=UserGet)
 def login_by_username(user: UserLogin, ctx: DBContext = Depends(db_context)):
-    db_user = main_repo.users.get_by_username(ctx, email=user.username)
-    if db_user is None:
+    db_user = main_repo.users.get_by_username(ctx, username=user.username)
+    if db_user is None or db_user.hashed_password != hash_password(user.password):
         raise HTTPException(status_code=400, detail="Email or password is invalid")
-    if db_user.hashed_password != hash_password(user.password):
-        raise HTTPException(status_code=400, detail="Email or password is invalid")
+    db_user = generate_token(user, ctx)
     return db_user

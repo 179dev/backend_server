@@ -18,11 +18,13 @@ def db_context():
         db.close()
 
 
-@router.post("/register/", response_model=UserCreate)
+@router.post("/register/", response_model=UserGet)
 def create_user(user: UserCreate, db: DBContext = Depends(db_context)):
     db_user = main_repo.users.get_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     db_user = main_repo.users.get_by_username(db, username=user.username)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
     new_user = User.create(user)
     return main_repo.users.insert(db, new_user)
