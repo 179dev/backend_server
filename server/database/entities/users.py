@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from uuid import UUID, uuid4
 import dataclasses
+from dataclasses import asdict
 from datetime import datetime
 from server.database.schemas.users import UserCreate
 
@@ -35,3 +36,11 @@ class User:
             token_expiration_date=None,
         )
         return new_user
+
+    def data_to_dict(self) -> dict:
+        """
+        Returns dict with data
+        """
+        data_dict = asdict(self)
+        data_dict.pop("settings")
+        return data_dict

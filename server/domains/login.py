@@ -1,7 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
-
 from server.database.db_settings import SessionLocal
 from server.database.db_context import DBContext
 from server.database.schemas.users import UserLogin, UserGet
@@ -27,7 +24,7 @@ def db_context():
         db.close()
 
 
-def generate_token(user: UserLogin, ctx: DBContext = Depends(db_context)):
+def generate_token(user: User, ctx: DBContext = Depends(db_context)):
     token_expiration_date = datetime.utcnow() + TOKEN_EXPIRE_TIME
     to_encode = {
         "username": user.username,
@@ -38,7 +35,7 @@ def generate_token(user: UserLogin, ctx: DBContext = Depends(db_context)):
     )
     user.token = token
     user.token_expiration_date = token_expiration_date
-    return main_repo.users.insert(ctx, UserLogin)
+    return main_repo.users.update_data(ctx, user)
 
 
 @router.post("/login/by_mail", response_model=UserGet)
@@ -46,7 +43,7 @@ def login_by_mail(user: UserLogin, ctx: DBContext = Depends(db_context)):
     db_user = main_repo.users.get_by_email(ctx, email=user.email)
     if db_user is None or db_user.hashed_password != hash_password(user.password):
         raise HTTPException(status_code=400, detail="Email or password is invalid")
-    db_user = generate_token(user, ctx)
+    db_user = generate_token(db_user, ctx)
     return db_user
 
 
@@ -55,5 +52,6 @@ def login_by_username(user: UserLogin, ctx: DBContext = Depends(db_context)):
     db_user = main_repo.users.get_by_username(ctx, username=user.username)
     if db_user is None or db_user.hashed_password != hash_password(user.password):
         raise HTTPException(status_code=400, detail="Email or password is invalid")
-    db_user = generate_token(user, ctx)
+    db_user = generate_token(db_user, ctx)
+    db_user = main_repo.users.get_by_username(ctx, username=user.username)
     return db_user
