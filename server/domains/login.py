@@ -6,9 +6,9 @@ from server.database.entities.users import User
 from server.database.entities.users import hash_password
 from datetime import datetime
 from server.config import (
-    TOKEN_EXPIRE_TIME,
+    AUTH_TOKEN_EXPIRE_TIME,
     TOKEN_GENERATION_ALGORITHM,
-    TOKEN_SECRET_KEY,
+    GENERATION_TOKEN_SECRET_KEY,
 )
 from jose import jwt
 from server import main_repo
@@ -25,20 +25,20 @@ def db_context():
 
 
 def generate_token(user: User, ctx: DBContext = Depends(db_context)):
-    token_expiration_date = datetime.utcnow() + TOKEN_EXPIRE_TIME
+    token_expiration_date = datetime.utcnow() + AUTH_TOKEN_EXPIRE_TIME
     to_encode = {
         "username": user.username,
         "exp": token_expiration_date,
     }
     token = jwt.encode(
-        to_encode, key=TOKEN_SECRET_KEY, algorithm=TOKEN_GENERATION_ALGORITHM
+        to_encode, key=GENERATION_TOKEN_SECRET_KEY, algorithm=TOKEN_GENERATION_ALGORITHM
     )
     user.token = token
     user.token_expiration_date = token_expiration_date
     return main_repo.users.update_data(ctx, user)
 
 
-@router.post("/login/by_mail", response_model=UserGet)
+@router.post("/login/by_email", response_model=UserGet)
 def login_by_mail(user: UserLogin, ctx: DBContext = Depends(db_context)):
     db_user = main_repo.users.get_by_email(ctx, email=user.email)
     if db_user is None or db_user.hashed_password != hash_password(user.password):
