@@ -53,6 +53,7 @@ async def get():
 
 @router.websocket("/ws/canvas/{canvas_id}")
 async def websocket_endpoint(canvas_id: int, websocket: WebSocket):
+    # TODO: Validate access
     if canvas_id not in canvases:
         canvases[canvas_id] = CanvasSession(canvas_id)
     user = await canvases[canvas_id].connect(websocket)

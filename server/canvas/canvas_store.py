@@ -27,6 +27,11 @@ class CanvasStore:
     local_ids_table: dict[int, CanvasElement]
     id_counter: int = 0
 
+    def __init__(self) -> None:
+        self.elements = []
+        self.registered_elements = set()
+        self.local_ids_table = {}
+
     def top_layer(self):
         return len(self.elements)
 
@@ -42,8 +47,8 @@ class CanvasStore:
     def add(self, element: CanvasElement, idx: SupportsIndex = -1):
         if idx == -1:
             self.elements.append(element)
-            return element
-        self.elements.insert(idx, element)
+        else:
+            self.elements.insert(idx, element)
         return self.register_if_isnt_already(element)
 
     def remove(self, element: CanvasElement):

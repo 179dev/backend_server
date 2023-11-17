@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class ActionTypeCodes(Enum):
+class ActionTypeCodes:
     add_shape = 1
     remove_shape = 2
     add_handle = 3

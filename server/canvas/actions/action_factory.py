@@ -12,5 +12,5 @@ ActionTypeCodeTable = {
 class ActionDecoder:
     @staticmethod
     def decode(signal: str) -> BaseAction:
-        action_type_code, *args = signal.split(DELIMITER_CHAR)
+        action_type_code, *args = map(int, signal.split(DELIMITER_CHAR))
         return ActionTypeCodeTable[action_type_code](*args)

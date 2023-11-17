@@ -61,4 +61,4 @@ class CanvasSession:
 
     async def broadcast_update(self, action: BaseAction):
         for connection in self.connections:
-            connection.send_text(action.encode())
+            await connection.send_text(action.encode())
