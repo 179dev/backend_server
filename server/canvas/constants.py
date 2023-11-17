@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class ActionType(Enum):
+class ActionTypeCodes(Enum):
     add_shape = 1
     remove_shape = 2
     add_handle = 3
@@ -14,3 +14,6 @@ class ShapeType(Enum):
     ellipsis = 2
     circle = 3
     line = 4
+
+
+DELIMITER_CHAR = ";"
