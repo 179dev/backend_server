@@ -14,6 +14,10 @@ class BaseAction(abc.ABC):
     def reverse_action(self) -> BaseAction:
         ...
 
+    @abc.abstractmethod
+    def encode(self) -> str:
+        ...
+
 
 class AddShape(BaseAction):
     shape: CanvasElement
@@ -32,7 +36,7 @@ class AddShape(BaseAction):
     def reverse_action(self):
         return RemoveShape(self.element_uid)
 
-    def encode(self):
+    def encode(self) -> str:
         return DELIMITER_CHAR.join(
             map(
                 str,
@@ -67,7 +71,7 @@ class RemoveShape(BaseAction):
             **self.shape.attributes,
         )
 
-    def encode(self):
+    def encode(self) -> str:
         return DELIMITER_CHAR.join(
             map(
                 str,

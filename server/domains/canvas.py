@@ -43,7 +43,7 @@ ws_debug_test_page = """
 </html>
 """
 
-canvases = {}
+canvases: dict[int, CanvasSession] = {}
 
 
 @router.get("/canvas/{canvas_id}")
@@ -55,10 +55,10 @@ async def get():
 async def websocket_endpoint(canvas_id: int, websocket: WebSocket):
     if canvas_id not in canvases:
         canvases[canvas_id] = CanvasSession(canvas_id)
-    await canvases[canvas_id].connect(websocket)
+    user = await canvases[canvas_id].connect(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            await canvases[canvas_id].handle_action(data)
+            await canvases[canvas_id].handle_action(user, data)
     except WebSocketDisconnect:
         canvases[canvas_id].disconnect(websocket)
