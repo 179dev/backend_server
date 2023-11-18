@@ -51,7 +51,7 @@ def login_by_mail(user: UserLogin, ctx: DBContext = Depends(db_context)):
 def login_by_username(user: UserLogin, ctx: DBContext = Depends(db_context)):
     db_user = main_repo.users.get_by_username(ctx, username=user.username)
     if db_user is None or db_user.hashed_password != hash_password(user.password):
-        raise HTTPException(status_code=400, detail="Email or password is invalid")
+        raise HTTPException(status_code=400, detail="Username or password is invalid")
     db_user = generate_token(db_user, ctx)
     db_user = main_repo.users.get_by_username(ctx, username=user.username)
     return db_user
