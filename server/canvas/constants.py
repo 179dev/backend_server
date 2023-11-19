@@ -16,4 +16,6 @@ class ShapeType(Enum):
     line = 4
 
 
+# A character used to separate fields in a string,
+# which represents an encoded action
 DELIMITER_CHAR = ";"
