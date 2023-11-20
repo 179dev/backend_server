@@ -59,6 +59,6 @@ async def websocket_endpoint(canvas_id: int, websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
-            await canvases[canvas_id].handle_action(data)
+            await canvases[canvas_id].handle_canvas_update(data)
     except WebSocketDisconnect:
         canvases[canvas_id].disconnect(websocket)
