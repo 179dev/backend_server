@@ -22,11 +22,13 @@ class CanvasSession:
     def disconnect(self, websocket: WebSocket):
         self.connections.remove(websocket)
 
-    async def handle_canvas_update(self, signal: str):
+    async def handle_canvas_update(self, signal: str, sender: WebSocket):
         self.drawing = signal
         # TODO: Add merging
-        await self.broadcast_update()
+        await self.broadcast_update(exclude=[sender])
 
-    async def broadcast_update(self):
+    async def broadcast_update(self, exclude: list[WebSocket]):
         for connection in self.connections:
+            if connection in exclude:
+                continue
             await connection.send_text(self.drawing)
