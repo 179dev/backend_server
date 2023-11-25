@@ -1,13 +1,13 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from uuid import UUID
 from datetime import datetime
 
 
 class UserBase(BaseModel):
-    """Common user data shared by all schemas"""
+    """Common user data shared by most schemas"""
 
-    email: str | None = None
-    username: str | None = None
+    email: EmailStr
+    username: str
 
 
 class UserGet(UserBase):

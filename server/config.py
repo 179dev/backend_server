@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+import email_validator
 
 INNER_PORT = os.getenv("INNER_PORT")
 POSTGRES_DB_NAME = os.getenv("POSTGRES_DB_NAME")
@@ -10,6 +11,10 @@ POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 GENERATION_TOKEN_SECRET_KEY = os.getenv("GENERATION_TOKEN_SECRET_KEY")
 TOKEN_GENERATION_ALGORITHM = os.getenv("TOKEN_GENERATION_ALGORITHM")
 AUTH_TOKEN_EXPIRE_TIME = timedelta(days=42)
+DEBUG = os.getenv("DEBUG") == "true"
+
+if DEBUG:
+    email_validator.CHECK_DELIVERABILITY = False
 
 if not (
     POSTGRES_DB_NAME

@@ -5,6 +5,7 @@ from server.database.db_context import DBContext
 from server.database.schemas.users import UserCreate, UserGet
 from server.database.entities.users import User
 from server import main_repo
+from server.utils import is_email
 
 router = APIRouter()
 
@@ -25,5 +26,12 @@ def create_user(user: UserCreate, db: DBContext = Depends(db_context)):
             raise HTTPException(status_code=400, detail="Username already registered")
         elif db_user.email == user.email:
             raise HTTPException(status_code=400, detail="Email already registered")
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail=f"User already exists",
+            )
+    if not is_email(user.email):
+        raise HTTPException(status_code=400, detail="Email not accessable")
     new_user = User.create(user)
     return main_repo.users.insert(db, new_user)

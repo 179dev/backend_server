@@ -1,9 +1,14 @@
-import re
-
-email_regex = re.compile(
-    r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+"
+from email_validator import (
+    validate_email,
+    EmailNotValidError,
+    EmailSyntaxError,
+    EmailUndeliverableError,
 )
 
 
 def is_email(a: str):
-    return re.fullmatch(email_regex, a)
+    try:
+        validate_email(a)
+        return True
+    except EmailNotValidError:
+        return False

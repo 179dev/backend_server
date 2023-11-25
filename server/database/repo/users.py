@@ -6,7 +6,7 @@ from server.database.schemas import users as users_schemas
 from server.database.entities import users as users_entities
 from server.database.db_context import DBContext
 from server.database.repo.exceptions import InvalidRepoCall
-from sqlalchemy import update
+from sqlalchemy import update, false, or_
 
 
 class UserRepoModule(BaseRepoModule):
@@ -59,16 +59,20 @@ class UserRepoModule(BaseRepoModule):
             raise InvalidRepoCall(
                 "Neither email, nor username, nor id, not token are specified"
             )
-        user = (
-            ctx.session.query(users_models.User)
-            .filter(
-                (users_models.User.email == email)
-                | (users_models.User.username == username)
-                | (users_models.User.id == id)
-                | (users_models.User.token == token)
-            )
-            .first()
-        )
+
+        column_checks = []
+        if email:
+            column_checks.append(users_models.User.email == email)
+        if username:
+            column_checks.append(users_models.User.username == username)
+        if id:
+            column_checks.append(users_models.User.id == id)
+        if token:
+            column_checks.append(users_models.User.token == token)
+
+        criteria = or_(false(), *column_checks)
+
+        user = ctx.session.query(users_models.User).filter(criteria).first()
         return user
 
     def every(self, ctx: DBContext, skip: int = 0, limit: int = 100):
