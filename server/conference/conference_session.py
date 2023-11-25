@@ -72,6 +72,9 @@ class ConferenceSession:
                 await user.send_json(
                     Action(other_user.canvas_id, other_user.canvas).to_json()
                 )
+        await self.broadcast_update(
+            Action(user.canvas_id, user.canvas), exclude=(user,)
+        )
         return user
 
     def is_active(self, timestamp: datetime = None):
