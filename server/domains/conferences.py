@@ -2,6 +2,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
 from server.conference.conference_session import ConferenceSession
+from server.conference.action import Action
 from server.config import INNER_PORT
 
 router = APIRouter()
@@ -60,6 +61,6 @@ async def websocket_endpoint(conference_id: int, websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_json()
-            await canvases[conference_id].handle_action(user, data)
+            await canvases[conference_id].handle_action(Action.cook_data(data), user)
     except WebSocketDisconnect:
         canvases[conference_id].disconnect(user)
