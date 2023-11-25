@@ -1,6 +1,6 @@
 from fastapi import WebSocket
 from server.conference.canvas_store import CanvasStore
-from server.conference.actions.action_factory import ActionEncoding
+from server.conference.actions.action_encoding import ActionEncoding
 from server.conference.actions.actions import BaseAction
 from server.conference.constants import MemberRole, ActionStatusCode
 
@@ -103,4 +103,4 @@ class ConferenceSession:
         for connection in self.connections:
             if connection in exclude:
                 continue
-            await connection.send_text(action.encode())
+            await connection.send_text(ActionEncoding.encode_action(action))

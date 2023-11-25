@@ -21,6 +21,16 @@ class ActionEncoding:
         return action, signal_id
 
     @staticmethod
+    def encode_action(action: BaseAction):
+        fields = action.get_fields()
+        return DELIMITER_CHAR.join(
+            map(
+                str,
+                fields.values(),
+            )
+        )
+
+    @staticmethod
     def encode_action_response(
         signal_id: int, status_code: ActionStatusCode, response_body: list[int]
     ):

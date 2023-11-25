@@ -24,7 +24,7 @@ class BaseAction(abc.ABC):
         ...
 
     @abc.abstractmethod
-    def encode(self) -> str:
+    def get_fields(self) -> dict:
         ...
 
     def response_data(self) -> list[str]:
@@ -52,21 +52,15 @@ class AddShape(BaseAction):
     def reverse_action(self):
         return RemoveShape(self.canvas_id, self.element_uid)
 
-    def encode(self) -> str:
-        return DELIMITER_CHAR.join(
-            map(
-                str,
-                (
-                    ActionTypeCodes.add_shape,
-                    self.canvas_id,
-                    self.shape_type,
-                    self.x,
-                    self.y,
-                    self.element_uid,
-                    # Extend on the attrs here
-                ),
-            )
-        )
+    def get_fields(self) -> dict:
+        return {
+            "action_type": ActionTypeCodes.add_shape,
+            "canvas_id": self.canvas_id,
+            "shape_type": self.shape_type,
+            "x": self.x,
+            "y": self.y,
+            "element_uid": self.element_uid,
+        }
 
     def response_data(self) -> list[str]:
         return [self.element_uid]
@@ -93,14 +87,9 @@ class RemoveShape(BaseAction):
             **self.shape.attributes,
         )
 
-    def encode(self) -> str:
-        return DELIMITER_CHAR.join(
-            map(
-                str,
-                (
-                    ActionTypeCodes.remove_shape,
-                    self.canvas_id,
-                    self.element_uid,
-                ),
-            )
-        )
+    def get_fields(self) -> dict:
+        return {
+            "action_type": ActionTypeCodes.remove_shape,
+            "canvas_id": self.canvas_id,
+            "element_uid": self.element_uid,
+        }
