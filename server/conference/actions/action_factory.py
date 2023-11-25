@@ -1,5 +1,5 @@
-from server.canvas.constants import ActionTypeCodes, DELIMITER_CHAR
-from server.canvas.actions.actions import *
+from server.conference.constants import ActionTypeCodes, DELIMITER_CHAR
+from server.conference.actions.actions import *
 
 
 ActionTypeCodeTable = {

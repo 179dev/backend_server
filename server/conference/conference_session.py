@@ -1,12 +1,12 @@
 from fastapi import WebSocket
-from server.canvas.canvas_store import CanvasStore
-from server.canvas.actions.action_factory import ActionDecoder
-from server.canvas.actions.actions import BaseAction
+from server.conference.canvas_store import CanvasStore
+from server.conference.actions.action_factory import ActionDecoder
+from server.conference.actions.actions import BaseAction
 
 # TODO: Include authorization checks and deanonimize
 
 
-class CanvasUser:
+class ConferenceMember:
     ws: WebSocket
     history: list[BaseAction]
     backwards_offset: int
@@ -34,19 +34,19 @@ class CanvasUser:
         return self.history[-self.backwards_offset].reverse_action()
 
 
-class CanvasSession:
-    canvas_id: int
+class ConferenceSession:
+    conference_id: int
     canvas: CanvasStore
     connections: list[WebSocket]
 
-    def __init__(self, canvas_id: int):
-        self.canvas_id = canvas_id
+    def __init__(self, conference_id: int):
+        self.conference_id = conference_id
         self.canvas = CanvasStore()
         self.connections = []
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
-        user = CanvasUser(websocket)
+        user = ConferenceMember(websocket)
         self.connections.append(user)
         # TODO: send full canvas information on connection
         return user
@@ -54,7 +54,7 @@ class CanvasSession:
     def disconnect(self, websocket: WebSocket):
         self.connections.remove(websocket)
 
-    async def handle_action(self, actor: CanvasUser, signal: str):
+    async def handle_action(self, actor: ConferenceMember, signal: str):
         action = ActionDecoder.decode(signal)
         actor.do(action).do(self.canvas)
         await self.broadcast_update(action)

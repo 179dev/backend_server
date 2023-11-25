@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import abc
-from server.canvas.canvas_store import CanvasElement, CanvasStore
-from server.canvas.constants import ShapeType, ActionTypeCodes, DELIMITER_CHAR
+from server.conference.canvas_store import CanvasElement, CanvasStore
+from server.conference.constants import ShapeType, ActionTypeCodes, DELIMITER_CHAR
 
 
 class BaseAction(abc.ABC):

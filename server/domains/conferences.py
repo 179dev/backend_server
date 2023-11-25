@@ -1,7 +1,7 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
-from server.canvas.canvas_session import CanvasSession
+from server.conference.conference_session import ConferenceSession
 from server.config import INNER_PORT
 
 router = APIRouter()
@@ -24,7 +24,7 @@ ws_debug_test_page = """
         <script>
             var client_id = 179
             document.querySelector("#ws-id").textContent = client_id;
-            var ws = new WebSocket(`ws://localhost:8179/ws/canvas/${client_id}`);
+            var ws = new WebSocket(`ws://localhost:8179/ws/conference/${client_id}`);
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages')
                 var message = document.createElement('li')
@@ -43,23 +43,23 @@ ws_debug_test_page = """
 </html>
 """
 
-canvases: dict[int, CanvasSession] = {}
+canvases: dict[int, ConferenceSession] = {}
 
 
-@router.get("/canvas/{canvas_id}")
+@router.get("/conference/{conference_id}")
 async def get():
     return HTMLResponse(ws_debug_test_page)
 
 
-@router.websocket("/ws/canvas/{canvas_id}")
-async def websocket_endpoint(canvas_id: int, websocket: WebSocket):
+@router.websocket("/ws/conference/{conference_id}")
+async def websocket_endpoint(conference_id: int, websocket: WebSocket):
     # TODO: Validate access
-    if canvas_id not in canvases:
-        canvases[canvas_id] = CanvasSession(canvas_id)
-    user = await canvases[canvas_id].connect(websocket)
+    if conference_id not in canvases:
+        canvases[conference_id] = ConferenceSession(conference_id)
+    user = await canvases[conference_id].connect(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            await canvases[canvas_id].handle_action(user, data)
+            await canvases[conference_id].handle_action(user, data)
     except WebSocketDisconnect:
-        canvases[canvas_id].disconnect(websocket)
+        canvases[conference_id].disconnect(websocket)

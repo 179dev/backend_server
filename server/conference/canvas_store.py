@@ -1,4 +1,4 @@
-from server.canvas.constants import ShapeType
+from server.conference.constants import ShapeType
 from typing import SupportsIndex
 
 
