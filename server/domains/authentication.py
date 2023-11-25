@@ -1,12 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
+from fastapi import Depends, HTTPException
 
 from server.database.db_settings import SessionLocal
 from server.database.db_context import DBContext
 from server.database.schemas.users import UserAuth
-from server.database.entities.users import User
-from server.database.entities.users import hash_password
 from server import main_repo
 from datetime import datetime
 

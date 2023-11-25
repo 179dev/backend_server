@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 
 from server.database.db_settings import SessionLocal
 from server.database.db_context import DBContext
