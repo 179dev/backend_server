@@ -49,15 +49,12 @@ class UserRepoModule(BaseRepoModule):
 
     def update_data(self, ctx: DBContext, user: users_entities.User):
         """
-        Function for updating data in database. Don't use for updating settings
+        Function for updating data in database.
         """
-        ctx.session.execute(
-            update(users_models.User)
-            .where(users_models.User.id == user.id)
-            .values(user.data_to_dict())
-        )
+        model = users_models.User.from_entity(user)
+        ctx.session.merge(model)
         ctx.session.commit()
-        return user
+        return self.get_by_id(ctx, model.id)
 
     def insert(self, ctx: DBContext, user: users_entities.User):
         db_user = users_models.User.from_entity(user)
