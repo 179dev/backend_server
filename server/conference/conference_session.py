@@ -56,9 +56,7 @@ class ConferenceSession:
         self, websocket: WebSocket, role: MemberRole = MemberRole.PARTICIPANT
     ):
         await websocket.accept()
-        # TODO: Currently, the first one to join a conference becomes it's owner.
-        # Just like in JackBox. It sound like a vulnerability though. In practice,
-        # it won't be that easy to abuse, but it's still worth mentioning.
+
         if not self.connections:
             role = max(role, MemberRole.OWNER)
         user = ConferenceMember(websocket, len(self.connections), role)
