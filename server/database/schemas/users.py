@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from uuid import UUID
 from datetime import datetime
 
@@ -40,5 +40,12 @@ class UserAuth(UserBase):
 class UserLogin(BaseModel):
     """User data for logging in"""
 
-    login: str
+    login: str = Field(
+        title="User's login string",
+        description=(
+            "This could be either a username or an email."
+            " The server will automatically detect the type of given data based on it's format"
+        ),
+        examples=["john_doe_cool_username", "john_doe@email.com"],
+    )
     password: str
