@@ -16,4 +16,8 @@ class Action:
         self.canvas_data = canvas_data
 
     def to_json(self) -> dict:
-        return {"target": self.target_canvas_id, "drawing": self.canvas_data}
+        return {
+            "type": "broadcast",
+            "target": self.target_canvas_id,
+            "drawing": self.canvas_data,
+        }
