@@ -3,6 +3,15 @@ from __future__ import annotations
 from enum import Enum
 
 
+class ActionStatusCode(Enum):
+    SUCCESS = 0
+    FAILURE = 1
+    FORBIDDEN = 2
+
+    def __str__(self):
+        return str(self.value)
+
+
 class MemberRole(Enum):
     OWNER = 4
     ASSISTANT = 3

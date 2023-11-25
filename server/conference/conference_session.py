@@ -1,8 +1,8 @@
 from fastapi import WebSocket
 from server.conference.canvas_store import CanvasStore
-from server.conference.actions.action_factory import ActionDecoder
+from server.conference.actions.action_factory import ActionEncoding
 from server.conference.actions.actions import BaseAction
-from server.conference.constants import MemberRole
+from server.conference.constants import MemberRole, ActionStatusCode
 
 # TODO: Include authorization checks and deanonimize
 
@@ -63,9 +63,7 @@ class ConferenceSession:
         self.connections = []
         self.canvases = []
 
-    async def connect(
-        self, websocket: WebSocket, role: MemberRole = MemberRole.PARTICIPANT
-    ):
+    async def connect(self, websocket: WebSocket, role: MemberRole = MemberRole.OWNER):
         await websocket.accept()
         user = ConferenceMember(websocket, role=role)
         self.connections.append(user)
@@ -77,14 +75,25 @@ class ConferenceSession:
         self.connections.remove(connection)
         self.canvases.remove(connection.canvas)
 
-    async def handle_action(self, actor: ConferenceMember, signal: str):
+    async def handle_action(self, actor: ConferenceMember, signal: str) -> list[int]:
         if not actor.can_do_anything():
             return
-        action = ActionDecoder.decode(signal)
+        action, signal_id = ActionEncoding.decode(signal)
         canvas = self.canvases[action.canvas_id]
         if actor.can_edit_canvas(canvas):
             action.record(actor).do(canvas)
             await self.broadcast_update(action, exclude=(actor,))
+            await actor.send_text(
+                ActionEncoding.encode_action_response(
+                    signal_id, ActionStatusCode.SUCCESS, action.response_data()
+                )
+            )
+            return
+        await actor.send_text(
+            ActionEncoding.encode_action_response(
+                signal_id, ActionStatusCode.FORBIDDEN, []
+            )
+        )
 
     async def broadcast_update(
         self, action: BaseAction, exclude: tuple[ConferenceMember] = None

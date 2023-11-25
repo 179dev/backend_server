@@ -27,10 +27,14 @@ class BaseAction(abc.ABC):
     def encode(self) -> str:
         ...
 
+    def response_data(self) -> list[str]:
+        return []
+
 
 class AddShape(BaseAction):
     shape: CanvasElement
     idx: int = -1
+    element_uid: int | None = None
 
     def __init__(
         self, canvas_id: int, shape_type: ShapeType, x: int, y: int, **kwargs: dict
@@ -63,6 +67,9 @@ class AddShape(BaseAction):
                 ),
             )
         )
+
+    def response_data(self) -> list[str]:
+        return [self.element_uid]
 
 
 class RemoveShape(BaseAction):

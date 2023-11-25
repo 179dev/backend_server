@@ -1,4 +1,8 @@
-from server.conference.constants import ActionTypeCodes, DELIMITER_CHAR
+from server.conference.constants import (
+    ActionTypeCodes,
+    DELIMITER_CHAR,
+    ActionStatusCode,
+)
 from server.conference.actions.actions import *
 
 
@@ -9,9 +13,24 @@ ActionTypeCodeTable: dict[ActionTypeCodes, BaseAction] = {
 }
 
 
-class ActionDecoder:
+class ActionEncoding:
     @staticmethod
-    def decode(signal: str) -> BaseAction:
-        action_type_code, *args = map(int, signal.split(DELIMITER_CHAR))
+    def decode(signal: str) -> tuple[BaseAction, int]:
+        signal_id, action_type_code, *args = map(int, signal.split(DELIMITER_CHAR))
         action = ActionTypeCodeTable[action_type_code](*args)
-        return action
+        return action, signal_id
+
+    @staticmethod
+    def encode_action_response(
+        signal_id: int, status_code: ActionStatusCode, response_body: list[int]
+    ):
+        return DELIMITER_CHAR.join(
+            map(
+                str,
+                [
+                    signal_id,
+                    status_code,
+                ]
+                + response_body,
+            )
+        )
