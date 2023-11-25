@@ -12,6 +12,7 @@ from server.config import (
 )
 from jose import jwt
 from server import main_repo
+from server.utils import is_email
 
 router = APIRouter()
 
@@ -24,7 +25,7 @@ def db_context():
         db.close()
 
 
-def generate_token(user: User, ctx: DBContext = Depends(db_context)):
+def update_token_in_user(user: User, ctx: DBContext = Depends(db_context)):
     token_expiration_date = datetime.utcnow() + AUTH_TOKEN_EXPIRE_TIME
     to_encode = {
         "username": user.username,
@@ -38,20 +39,14 @@ def generate_token(user: User, ctx: DBContext = Depends(db_context)):
     return main_repo.users.update_data(ctx, user)
 
 
-@router.post("/login/by_email", response_model=UserAuth)
-def login_by_mail(user: UserLogin, ctx: DBContext = Depends(db_context)):
-    db_user = main_repo.users.get_by_email(ctx, email=user.email)
+@router.post("/login", response_model=UserAuth)
+def login(user: UserLogin, ctx: DBContext = Depends(db_context)):
+    login = user.login
+    if is_email(login):
+        db_user = main_repo.users.get_by_email(ctx, email=login)
+    else:
+        db_user = main_repo.users.get_by_username(ctx, username=login)
     if db_user is None or db_user.hashed_password != hash_password(user.password):
-        raise HTTPException(status_code=400, detail="Email or password is invalid")
-    db_user = generate_token(db_user, ctx)
-    return db_user
-
-
-@router.post("/login/by_username", response_model=UserAuth)
-def login_by_username(user: UserLogin, ctx: DBContext = Depends(db_context)):
-    db_user = main_repo.users.get_by_username(ctx, username=user.username)
-    if db_user is None or db_user.hashed_password != hash_password(user.password):
-        raise HTTPException(status_code=400, detail="Username or password is invalid")
-    db_user = generate_token(db_user, ctx)
-    db_user = main_repo.users.get_by_username(ctx, username=user.username)
+        raise HTTPException(status_code=400, detail="Login or password is invalid")
+    db_user = update_token_in_user(db_user, ctx)
     return db_user

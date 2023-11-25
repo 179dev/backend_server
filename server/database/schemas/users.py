@@ -37,10 +37,8 @@ class UserAuth(UserBase):
         orm_mode = True
 
 
-class UserLogin(UserBase):
+class UserLogin(BaseModel):
     """User data for logging in"""
 
+    login: str
     password: str
-
-    class Config:
-        orm_mode = True
