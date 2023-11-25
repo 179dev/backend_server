@@ -37,7 +37,7 @@ class ConferenceMember:
 class ConferenceSession:
     conference_id: int
     canvas: CanvasStore
-    connections: list[WebSocket]
+    connections: list[ConferenceMember]
 
     def __init__(self, conference_id: int):
         self.conference_id = conference_id
@@ -57,8 +57,14 @@ class ConferenceSession:
     async def handle_action(self, actor: ConferenceMember, signal: str):
         action = ActionDecoder.decode(signal)
         actor.do(action).do(self.canvas)
-        await self.broadcast_update(action)
+        await self.broadcast_update(action, exclude=(actor,))
 
-    async def broadcast_update(self, action: BaseAction):
+    async def broadcast_update(
+        self, action: BaseAction, exclude: tuple[ConferenceMember] = None
+    ):
+        if exclude is None:
+            exclude = set()
         for connection in self.connections:
+            if connection in exclude:
+                continue
             await connection.send_text(action.encode())
