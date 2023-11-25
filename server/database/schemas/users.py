@@ -14,8 +14,6 @@ class UserGet(UserBase):
     """User data which can be read"""
 
     id: UUID
-    token: str | None = None
-    token_expiration_date: datetime | None = None
     display_name: str | None = None
 
 
@@ -30,7 +28,7 @@ class UserCreate(UserBase):
 
 
 class UserAuth(UserBase):
-    """User data for authentification"""
+    """User data for authentication"""
 
     token: str
     token_expiration_date: datetime

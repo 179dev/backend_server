@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from server.database.db_settings import SessionLocal
 from server.database.db_context import DBContext
-from server.database.schemas.users import UserLogin, UserGet
+from server.database.schemas.users import UserLogin, UserAuth
 from server.database.entities.users import User
 from server.database.entities.users import hash_password
 from datetime import datetime
@@ -38,7 +38,7 @@ def generate_token(user: User, ctx: DBContext = Depends(db_context)):
     return main_repo.users.update_data(ctx, user)
 
 
-@router.post("/login/by_email", response_model=UserGet)
+@router.post("/login/by_email", response_model=UserAuth)
 def login_by_mail(user: UserLogin, ctx: DBContext = Depends(db_context)):
     db_user = main_repo.users.get_by_email(ctx, email=user.email)
     if db_user is None or db_user.hashed_password != hash_password(user.password):
@@ -47,7 +47,7 @@ def login_by_mail(user: UserLogin, ctx: DBContext = Depends(db_context)):
     return db_user
 
 
-@router.post("/login/by_username", response_model=UserGet)
+@router.post("/login/by_username", response_model=UserAuth)
 def login_by_username(user: UserLogin, ctx: DBContext = Depends(db_context)):
     db_user = main_repo.users.get_by_username(ctx, username=user.username)
     if db_user is None or db_user.hashed_password != hash_password(user.password):
