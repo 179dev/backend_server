@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Uuid
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Uuid, DateTime
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from uuid import UUID
 from server.database.db_settings import Base
@@ -15,7 +15,10 @@ class User(Base, EntityLikeMixin):
         "hashed_password",
         "username",
         "display_name",
+        "token",
+        "token_expiration_date",
     )
+
     __entity__ = UserEntity
     __attrs_from_entity__ = {"settings": json.dumps}
     __attrs_to_entity__ = {"settings": json.loads}
@@ -26,3 +29,5 @@ class User(Base, EntityLikeMixin):
     display_name: Mapped[str] = mapped_column(String(256), nullable=True)
     hashed_password: Mapped[str] = mapped_column(String)
     settings: Mapped[str] = mapped_column(String(1024), default="{}")
+    token: Mapped[str] = mapped_column(String, unique=True, nullable=True)
+    token_expiration_date: Mapped[DateTime] = mapped_column(DateTime, nullable=True)

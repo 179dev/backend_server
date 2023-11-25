@@ -1,15 +1,18 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from server.routers import users
+from server.domains import users
+from server.domains import login
+from server.domains import registration
 from server.database.db_settings import Base, engine
 from server.config import ALLOWED_ORIGINS
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
 app.include_router(users.router)
+app.include_router(login.router)
+app.include_router(registration.router)
 
 
 app.add_middleware(

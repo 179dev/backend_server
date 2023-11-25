@@ -2,9 +2,9 @@ services:
   server:
     build: .
     env_file:
-        - .env
+      - .env
     volumes:
-        - ./data:/server/data
+      - ./data:/server/data
     restart: always
     environment:
       - POSTGRES_HOST=database
@@ -13,12 +13,12 @@ services:
       - database
       # - migration
     extra_hosts:
-        - "host.docker.internal:0.0.0.0"
+      - "host.docker.internal:0.0.0.0"
     networks:
       - server_network
     ports:
       - '${OUTER_PORT}:${INNER_PORT}'
-  
+
   database:
     image: postgres:latest
     restart: always
@@ -34,6 +34,6 @@ services:
 networks:
   server_network:
     driver: bridge
-  
+
 volumes:
   server-database-data:
