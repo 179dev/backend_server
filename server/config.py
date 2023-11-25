@@ -1,4 +1,5 @@
 import os
+import datetime
 
 # Env variables
 INNER_PORT = os.getenv("INNER_PORT")
@@ -9,6 +10,10 @@ POSTGRES_PORT = os.getenv("POSTGRES_PORT")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 DEBUG = os.getenv("DEBUG") != "false"
 
+CONFERENCE_EXPIRATION_TIME = (
+    datetime.timedelta(hours=2) if not DEBUG else datetime.timedelta(minutes=5)
+)
+CONFERENCE_GC_RATE = 60 * 60 if not DEBUG else 60
 
 if not (
     POSTGRES_DB_NAME
