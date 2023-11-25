@@ -5,6 +5,7 @@ from server.database.models import users as users_models
 from server.database.schemas import users as users_schemas
 from server.database.entities import users as users_entities
 from server.database.db_context import DBContext
+from server.database.repo.exceptions import InvalidRepoCall
 from sqlalchemy import update
 
 
@@ -37,6 +38,35 @@ class UserRepoModule(BaseRepoModule):
         user = (
             ctx.session.query(users_models.User)
             .filter(users_models.User.token == token)
+            .first()
+        )
+        return user
+
+    def find_user(
+        self,
+        ctx: DBContext,
+        email: str = None,
+        username: str = None,
+        id: UUID = None,
+        token: str = None,
+    ):
+        """
+        Returns a user which matches either of given criteria.
+        Note that the criteria are disjuncted here, not conjuncted.
+        Do not use with one criteria! Use a getter method for a specific field instead.
+        """
+        if not (email or username or id or token):
+            raise InvalidRepoCall(
+                "Neither email, nor username, nor id, not token are specified"
+            )
+        user = (
+            ctx.session.query(users_models.User)
+            .filter(
+                (users_models.User.email == email)
+                | (users_models.User.username == username)
+                | (users_models.User.id == id)
+                | (users_models.User.token == token)
+            )
             .first()
         )
         return user
