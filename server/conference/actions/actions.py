@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 import typing
 from server.conference.canvas_store import CanvasElement, CanvasStore
-from server.conference.constants import ShapeType, ActionTypeCodes, DELIMITER_CHAR
+from server.conference.constants import ShapeType, ActionTypeCodes
 
 if typing.TYPE_CHECKING:
     from server.conference.conference_session import ConferenceMember

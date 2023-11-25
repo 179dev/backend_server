@@ -1,7 +1,9 @@
 from server.conference.constants import (
     ActionTypeCodes,
-    DELIMITER_CHAR,
     ActionStatusCode,
+    DELIMITER_CHAR,
+    ACTION_BROADCAST_PREFIX,
+    RESPONSE_PREFIX,
 )
 from server.conference.actions.actions import *
 
@@ -13,6 +15,7 @@ ActionTypeCodeTable: dict[ActionTypeCodes, BaseAction] = {
 }
 
 
+# TODO: Validate signals
 class ActionEncoding:
     @staticmethod
     def decode(signal: str) -> tuple[BaseAction, int]:
@@ -23,7 +26,7 @@ class ActionEncoding:
     @staticmethod
     def encode_action(action: BaseAction):
         fields = action.get_fields()
-        return DELIMITER_CHAR.join(
+        return ACTION_BROADCAST_PREFIX + DELIMITER_CHAR.join(
             map(
                 str,
                 fields.values(),
@@ -34,7 +37,7 @@ class ActionEncoding:
     def encode_action_response(
         signal_id: int, status_code: ActionStatusCode, response_body: list[int]
     ):
-        return DELIMITER_CHAR.join(
+        return RESPONSE_PREFIX + DELIMITER_CHAR.join(
             map(
                 str,
                 [

@@ -47,3 +47,5 @@ class ShapeType(Enum):
 
 
 DELIMITER_CHAR = ";"
+RESPONSE_PREFIX = "#"
+ACTION_BROADCAST_PREFIX = "!"
