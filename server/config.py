@@ -7,6 +7,8 @@ POSTGRES_USERNAME = os.getenv("POSTGRES_USERNAME")
 POSTGRES_HOST = os.getenv("POSTGRES_HOST")
 POSTGRES_PORT = os.getenv("POSTGRES_PORT")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+DEBUG = os.getenv("DEBUG") != "false"
+
 
 if not (
     POSTGRES_DB_NAME

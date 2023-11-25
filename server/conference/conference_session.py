@@ -38,18 +38,29 @@ class ConferenceMember:
 
 
 class ConferenceSession:
-    conference_id: int
     connections: list[ConferenceMember]
+    owner: ConferenceMember | None
 
-    def __init__(self, conference_id: int):
-        self.conference_id = conference_id
+    def __init__(self):
         self.connections = []
+        self.owner = None
 
-    async def connect(self, websocket: WebSocket, role: MemberRole = MemberRole.OWNER):
+    async def connect(
+        self, websocket: WebSocket, role: MemberRole = MemberRole.PARTICIPANT
+    ):
         await websocket.accept()
+        # TODO: Currently, the first one to join a conference becomes it's owner.
+        # Just like in JackBox. It sound like a vulnerability though. In practice,
+        # it won't be that easy to abuse, but it's still worth mentioning.
+        if not self.connections:
+            role = max(role, MemberRole.OWNER)
         user = ConferenceMember(websocket, len(self.connections), role)
+        if not self.owner:
+            self.owner = user
         self.connections.append(user)
-        await user.send_json({"type": "welcome", "id": user.canvas_id})
+        await user.send_json(
+            {"type": "welcome", "id": user.canvas_id, "role": user.role.value}
+        )
         for other_user in self.connections:
             if other_user.has_a_canvas():
                 await user.send_json(
