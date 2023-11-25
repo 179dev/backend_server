@@ -1,12 +1,12 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse, JSONResponse, Response
+from fastapi.responses import JSONResponse, Response
 
 from server.vendor.repeat_every import repeat_every
 from server.conference.conference_session import ConferenceSession
 from server.conference.action import Action
 from server.config import CONFERENCE_GC_RATE
 
-from uuid import uuid4, UUID
+from uuid import uuid4
 import datetime
 
 router = APIRouter()

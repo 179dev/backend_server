@@ -1,9 +1,6 @@
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
 
-from server.conference.conference_session import ConferenceSession
-from uuid import UUID
-
 router = APIRouter()
 
 ws_debug_test_page = """
