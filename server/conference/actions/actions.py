@@ -1,12 +1,19 @@
 from __future__ import annotations
 
 import abc
+import typing
 from server.conference.canvas_store import CanvasElement, CanvasStore
 from server.conference.constants import ShapeType, ActionTypeCodes, DELIMITER_CHAR
+
+if typing.TYPE_CHECKING:
+    from server.conference.conference_session import ConferenceMember
 
 
 class BaseAction(abc.ABC):
     canvas_id: int
+
+    def record(self, actor: ConferenceMember) -> BaseAction:
+        return actor.record(self)
 
     @abc.abstractmethod
     def do(self, canvas: CanvasStore):

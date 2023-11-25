@@ -83,7 +83,7 @@ class ConferenceSession:
         action = ActionDecoder.decode(signal)
         canvas = self.canvases[action.canvas_id]
         if actor.can_edit_canvas(canvas):
-            actor.record(action).do(self.canvas)
+            action.record(actor).do(canvas)
             await self.broadcast_update(action, exclude=(actor,))
 
     async def broadcast_update(
