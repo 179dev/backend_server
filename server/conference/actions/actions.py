@@ -6,6 +6,8 @@ from server.conference.constants import ShapeType, ActionTypeCodes, DELIMITER_CH
 
 
 class BaseAction(abc.ABC):
+    canvas_id: int
+
     @abc.abstractmethod
     def do(self, canvas: CanvasStore):
         ...
@@ -23,7 +25,10 @@ class AddShape(BaseAction):
     shape: CanvasElement
     idx: int = -1
 
-    def __init__(self, shape_type: ShapeType, x: int, y: int, **kwargs: dict) -> None:
+    def __init__(
+        self, canvas_id: int, shape_type: ShapeType, x: int, y: int, **kwargs: dict
+    ) -> None:
+        self.canvas_id = canvas_id
         self.shape_type = shape_type
         self.x = x
         self.y = y
@@ -34,7 +39,7 @@ class AddShape(BaseAction):
         self.element_uid = canvas.add(self.shape, self.idx)
 
     def reverse_action(self):
-        return RemoveShape(self.element_uid)
+        return RemoveShape(self.canvas_id, self.element_uid)
 
     def encode(self) -> str:
         return DELIMITER_CHAR.join(
@@ -42,6 +47,7 @@ class AddShape(BaseAction):
                 str,
                 (
                     ActionTypeCodes.add_shape,
+                    self.canvas_id,
                     self.shape_type,
                     self.x,
                     self.y,
@@ -55,7 +61,8 @@ class AddShape(BaseAction):
 class RemoveShape(BaseAction):
     element_uid: int
 
-    def __init__(self, element_uid: int) -> None:
+    def __init__(self, canvas_id: int, element_uid: int) -> None:
+        self.canvas_id = canvas_id
         self.element_uid = element_uid
 
     def do(self, canvas: CanvasStore):
@@ -65,6 +72,7 @@ class RemoveShape(BaseAction):
 
     def reverse_action(self):
         return AddShape(
+            self.canvas_id,
             self.shape.shape_type,
             self.shape.x,
             self.shape.y,
@@ -77,6 +85,7 @@ class RemoveShape(BaseAction):
                 str,
                 (
                     ActionTypeCodes.remove_shape,
+                    self.canvas_id,
                     self.element_uid,
                 ),
             )

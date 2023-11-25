@@ -62,4 +62,4 @@ async def websocket_endpoint(conference_id: int, websocket: WebSocket):
             data = await websocket.receive_text()
             await canvases[conference_id].handle_action(user, data)
     except WebSocketDisconnect:
-        canvases[conference_id].disconnect(websocket)
+        canvases[conference_id].disconnect(user)
