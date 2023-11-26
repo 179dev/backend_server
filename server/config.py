@@ -10,12 +10,17 @@ POSTGRES_PORT = os.getenv("POSTGRES_PORT")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 DEBUG = os.getenv("DEBUG") != "false"
 
-# Conference garbage collection constants:
 CONFERENCE_EXPIRATION_TIME = (
-    datetime.timedelta(hours=2) if not DEBUG else datetime.timedelta(minutes=10)
-)  # NOTE: In debug mode unused or inactive conferences have TTL if 10 minutes.
-CONFERENCE_GC_RATE = 60 * 60 if not DEBUG else 60
-# NOTE: In debug mode garbage collection is performed every minute.
+    datetime.timedelta(seconds=int(os.getenv("CONFERENCE_EXPIRATION_TIME")))
+    if not DEBUG
+    else datetime.timedelta(seconds=int(os.getenv("DEBUG_CONFERENCE_EXPIRATION_TIME")))
+)
+CONFERENCE_GC_RATE = (
+    datetime.timedelta(seconds=int(os.getenv("CONFERENCE_GC_RATE")))
+    if not DEBUG
+    else datetime.timedelta(seconds=int(os.getenv("DEBUG_CONFERENCE_GC_RATE")))
+)
+
 
 if not (
     POSTGRES_DB_NAME
