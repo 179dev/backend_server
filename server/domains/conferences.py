@@ -29,7 +29,9 @@ async def websocket_endpoint(conference_id: str, websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_json()
-            await conferences[conference_id].handle_action(Action.cook_data(data), user)
+            await conferences[conference_id].handle_action(
+                Action.from_raw_data(data), user
+            )
     except WebSocketDisconnect:
         conferences[conference_id].disconnect(user)
         if not conferences[conference_id].is_active():

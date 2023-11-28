@@ -6,7 +6,7 @@ class Action:
     canvas_data: str
 
     @classmethod
-    def cook_data(cls, raw_data: dict) -> Action:
+    def from_raw_data(cls, raw_data: dict) -> Action:
         return Action(
             target_canvas_id=int(raw_data["target"]), canvas_data=raw_data["drawing"]
         )
