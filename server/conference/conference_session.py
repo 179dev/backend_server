@@ -82,7 +82,8 @@ class ConferenceSession:
             timestamp = datetime.utcnow()
         return (
             self.connections
-            and (timestamp - self.last_activity) < CONFERENCE_EXPIRATION_TIME
+            and (timestamp - self.last_activity).total_seconds()
+            < CONFERENCE_EXPIRATION_TIME
         )
 
     def disconnect(self, connection: ConferenceMember):

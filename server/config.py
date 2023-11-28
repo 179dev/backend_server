@@ -11,14 +11,14 @@ POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 DEBUG = os.getenv("DEBUG") != "false"
 
 CONFERENCE_EXPIRATION_TIME = (
-    datetime.timedelta(seconds=int(os.getenv("CONFERENCE_EXPIRATION_TIME")))
+    int(os.getenv("CONFERENCE_EXPIRATION_TIME"))
     if not DEBUG
-    else datetime.timedelta(seconds=int(os.getenv("DEBUG_CONFERENCE_EXPIRATION_TIME")))
+    else int(os.getenv("DEBUG_CONFERENCE_EXPIRATION_TIME"))
 )
 CONFERENCE_GC_RATE = (
-    datetime.timedelta(seconds=int(os.getenv("CONFERENCE_GC_RATE")))
+    int(os.getenv("CONFERENCE_GC_RATE"))
     if not DEBUG
-    else datetime.timedelta(seconds=int(os.getenv("DEBUG_CONFERENCE_GC_RATE")))
+    else int(os.getenv("DEBUG_CONFERENCE_GC_RATE"))
 )
 
 
