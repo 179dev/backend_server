@@ -59,22 +59,29 @@ class ConferenceSession:
 
         if not self.connections:
             role = max(role, MemberRole.OWNER)
+
         user = ConferenceMember(websocket, len(self.connections), role)
+
         if not self.owner:
             self.owner = user
+
         self.connections.append(user)
         self.poke()
+
         await user.send_json(
             {"type": "welcome", "id": user.canvas_id, "role": user.role.value}
         )
+
         for other_user in self.connections:
             if other_user.has_canvas():
                 await user.send_json(
                     Action(other_user.canvas_id, other_user.canvas).to_json()
                 )
+
         await self.broadcast_update(
             Action(user.canvas_id, user.canvas), exclude=(user,)
         )
+
         return user
 
     def is_active(self, timestamp: datetime = None) -> bool:
@@ -91,14 +98,17 @@ class ConferenceSession:
 
     async def handle_action(self, action: Action, actor: ConferenceMember):
         self.poke()
+
         if not actor.can_do_anything():
             return
         if not actor.can_edit_canvas(action.target_canvas_id):
             return
+
         try:
             self.connections[action.target_canvas_id].canvas = action.canvas_data
         except IndexError:
             return
+
         await self.broadcast_update(action, exclude=(actor,))
 
     async def broadcast_update(
@@ -106,6 +116,7 @@ class ConferenceSession:
     ):
         if exclude is None:
             exclude = set()
+
         for connection in self.connections:
             if connection in exclude:
                 continue
