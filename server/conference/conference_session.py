@@ -18,24 +18,24 @@ class ConferenceMember:
         self.canvas = "" if self.has_canvas() else None
         self.canvas_id = canvas_id
 
-    async def send_text(self, text):
+    async def send_text(self, text: str):
         await self.ws.send_text(text)
 
-    async def send_json(self, json):
-        await self.ws.send_json(json)
+    async def send_json(self, data: dict):
+        await self.ws.send_json(data)
 
-    def can_edit_canvas(self, canvas_id: int):
+    def can_edit_canvas(self, canvas_id: int) -> bool:
         return self.can_edit_other_canvases() or (
             (canvas_id == self.canvas_id) and self.can_do_anything()
         )
 
-    def can_edit_other_canvases(self):
+    def can_edit_other_canvases(self) -> bool:
         return self.role >= MemberRole.ASSISTANT
 
-    def has_canvas(self):
+    def has_canvas(self) -> bool:
         return self.role >= MemberRole.PARTICIPANT
 
-    def can_do_anything(self):
+    def can_do_anything(self) -> bool:
         return self.role >= MemberRole.PARTICIPANT
 
 
@@ -77,7 +77,7 @@ class ConferenceSession:
         )
         return user
 
-    def is_active(self, timestamp: datetime = None):
+    def is_active(self, timestamp: datetime = None) -> bool:
         if timestamp is None:
             timestamp = datetime.utcnow()
         return (
@@ -89,7 +89,7 @@ class ConferenceSession:
     def disconnect(self, connection: ConferenceMember):
         self.connections.remove(connection)
 
-    async def handle_action(self, action: Action, actor: ConferenceMember) -> list[int]:
+    async def handle_action(self, action: Action, actor: ConferenceMember):
         self.poke()
         if not actor.can_do_anything():
             return
