@@ -3,6 +3,7 @@ from server.conference.constants import MemberRole
 from server.conference.action import Action
 from server.config import CONFERENCE_EXPIRATION_TIME
 from datetime import datetime
+from uuid import UUID
 
 
 class ConferenceMember:
@@ -43,8 +44,10 @@ class ConferenceSession:
     connections: list[ConferenceMember]
     owner: ConferenceMember | None
     last_activity: datetime
+    id: UUID
 
-    def __init__(self):
+    def __init__(self, id: UUID):
+        self.id = id
         self.connections = []
         self.owner = None
         self.poke()

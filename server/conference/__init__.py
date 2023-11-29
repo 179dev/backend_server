@@ -1,0 +1,3 @@
+from server.conference.conference_sessions_pool import ConferenceSessionsPool
+
+main_conference_sessions_pool = ConferenceSessionsPool()
