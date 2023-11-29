@@ -15,7 +15,7 @@ class ConferenceMember:
     ) -> None:
         self.ws = ws
         self.role = role
-        self.canvas = "" if self.has_a_canvas() else None
+        self.canvas = "" if self.has_canvas() else None
         self.canvas_id = canvas_id
 
     async def send_text(self, text):
@@ -32,7 +32,7 @@ class ConferenceMember:
     def can_edit_other_canvases(self):
         return self.role >= MemberRole.ASSISTANT
 
-    def has_a_canvas(self):
+    def has_canvas(self):
         return self.role >= MemberRole.PARTICIPANT
 
     def can_do_anything(self):
@@ -68,7 +68,7 @@ class ConferenceSession:
             {"type": "welcome", "id": user.canvas_id, "role": user.role.value}
         )
         for other_user in self.connections:
-            if other_user.has_a_canvas():
+            if other_user.has_canvas():
                 await user.send_json(
                     Action(other_user.canvas_id, other_user.canvas).to_json()
                 )
