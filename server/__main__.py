@@ -12,8 +12,11 @@ Base.metadata.create_all(bind=engine)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # On startup:
     await conferences.conference_garbage_collect()
     yield
+    # On shutdown:
+    ...
 
 
 app = FastAPI(lifespan=lifespan)
