@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 
 router = APIRouter()
 
-ws_debug_test_page = """
+WS_DEBUG_TEST_PAGE = """
 <!DOCTYPE html>
 <html>
     <head>
@@ -43,4 +43,4 @@ ws_debug_test_page = """
 
 @router.get("/conference/{conference_id}")
 async def get(conference_id: str):
-    return HTMLResponse(ws_debug_test_page.replace("$$CONFERENCE_ID", conference_id))
+    return HTMLResponse(WS_DEBUG_TEST_PAGE.replace("$$CONFERENCE_ID", conference_id))
