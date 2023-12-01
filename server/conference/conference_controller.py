@@ -6,7 +6,10 @@ if TYPE_CHECKING:
 
 from fastapi import WebSocket, WebSocketDisconnect
 
-from server.conference.exceptions import ForbiddenConferenceAction
+from server.conference.exceptions import (
+    ForbiddenConferenceAction,
+    ConferenceValidationError,
+)
 
 from server.conference.message_coding.base_message_coding import BaseMessageCoding
 from server.conference.conference_session import ConferenceSession, ConferenceMember
@@ -130,10 +133,14 @@ class ConferenceController:
         try:
             while True:
                 data = await websocket.receive_text()
-                message = self.message_coding.decode_message(
-                    message_str=data, sender=member
-                )
-                await self.on_message(message)
+                try:
+                    message = self.message_coding.decode_message(
+                        message_str=data, sender=member
+                    )
+                    await self.on_message(message)
+                except ConferenceValidationError:
+                    # Handle invalid data
+                    continue
         except WebSocketDisconnect:
             await self.close_connection(member.id)
             self.remove_connection(member.id)

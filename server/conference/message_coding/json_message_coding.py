@@ -3,6 +3,7 @@ import json
 from server.conference.message_coding.base_message_coding import BaseMessageCoding
 from server.conference.messages import *
 from server.conference.conference_session import ConferenceMember
+from server.conference.exceptions import ConferenceValidationError
 
 
 class JSONMessageCoding(BaseMessageCoding):
@@ -24,12 +25,17 @@ class JSONMessageCoding(BaseMessageCoding):
 
     @staticmethod
     def decode_message(message_str: str, sender: ConferenceMember) -> BaseClientMessage:
-        message_dict = json.loads(message_str)
+        try:
+            message_dict = json.loads(message_str)
+        except json.JSONDecodeError:
+            raise ConferenceValidationError("Message is not JSON")
         match message_dict:
-            case _:  # There is only one client message type yet
+            case {"target": int(), "drawing": str()}:
                 message = WriteCanvasMessage(
                     sender=sender,
                     target_canvas=sender.conference.get_canvas(message_dict["target"]),
                     data_override=CanvasData(message_dict["drawing"]),
                 )
                 return message
+            case _:
+                raise ConferenceValidationError("Unable to parse message")

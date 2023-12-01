@@ -8,3 +8,7 @@ class ConferenceControllerError(Exception):
 
 class ForbiddenConferenceAction(Exception):
     pass
+
+
+class ConferenceValidationError(ConferenceControllerError):
+    pass
