@@ -2,7 +2,7 @@ import json
 
 from server.conference.message_coding.base_message_coding import BaseMessageCoding
 from server.conference.messages import *
-from server.conference.conference_session import ConferenceSession
+from server.conference.conference_session import ConferenceMember
 
 
 class JSONMessageCoding(BaseMessageCoding):

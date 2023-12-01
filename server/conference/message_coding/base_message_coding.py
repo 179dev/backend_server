@@ -1,4 +1,5 @@
 from server.conference.messages import *
+from server.conference.conference_session import ConferenceMember
 
 
 class BaseMessageCoding:
@@ -7,5 +8,5 @@ class BaseMessageCoding:
         ...
 
     @staticmethod
-    def decode_message(message: str) -> BaseClientMessage:
+    def decode_message(message: str, sender: ConferenceMember) -> BaseClientMessage:
         ...

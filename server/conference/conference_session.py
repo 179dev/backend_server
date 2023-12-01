@@ -1,126 +1,140 @@
-from fastapi import WebSocket
+from __future__ import annotations
+
 from server.conference.constants import MemberRole
-from server.conference.action import Action
-from server.config import CONFERENCE_EXPIRATION_TIME
+from server.config import (
+    CONFERENCE_EXPIRATION_TIME,
+    CONFERENCE_SYNC_MEMBER_AND_CANVAS_IDS,
+)
+from server.conference.canvas import Canvas, CanvasData
+from server.conference.exceptions import ForbiddenConferenceAction
 from datetime import datetime
 from uuid import UUID
 
 
 class ConferenceMember:
-    ws: WebSocket
-    canvas: str | None
     role: MemberRole
+    id: int
+    conference: ConferenceSession
+    canvas: Canvas | None = None
 
     def __init__(
-        self, ws: WebSocket, canvas_id: int, role: MemberRole = MemberRole.PARTICIPANT
+        self,
+        id: int,
+        conference: ConferenceSession,
+        role: MemberRole = MemberRole.PARTICIPANT,
     ) -> None:
-        self.ws = ws
         self.role = role
-        self.canvas = "" if self.has_canvas() else None
-        self.canvas_id = canvas_id
+        self.id = id
+        self.conference = conference
 
-    async def send_text(self, text: str):
-        await self.ws.send_text(text)
-
-    async def send_json(self, data: dict):
-        await self.ws.send_json(data)
-
-    def can_edit_canvas(self, canvas_id: int) -> bool:
-        return self.can_edit_other_canvases() or (
-            (canvas_id == self.canvas_id) and self.can_do_anything()
-        )
-
-    def can_edit_other_canvases(self) -> bool:
-        return self.role >= MemberRole.ASSISTANT
-
-    def has_canvas(self) -> bool:
-        return self.role >= MemberRole.PARTICIPANT
-
-    def can_do_anything(self) -> bool:
-        return self.role >= MemberRole.PARTICIPANT
+    def set_canvas(self, canvas: Canvas):
+        self.canvas = canvas
 
 
 class ConferenceSession:
-    connections: list[ConferenceMember]
+    canvases: dict[int, Canvas]
+    members: dict[int, ConferenceMember]
     owner: ConferenceMember | None
     last_activity: datetime
     id: UUID
+    _canvas_id_counter: int = 0
+    _member_id_counter: int = 0
+    sync_canvas_and_member_ids: bool
 
     def __init__(self, id: UUID):
         self.id = id
-        self.connections = []
+        self.canvases = []
+        self.members = []
         self.owner = None
+        self.sync_canvas_and_member_ids = CONFERENCE_SYNC_MEMBER_AND_CANVAS_IDS
         self.poke()
+
+    def _generate_new_canvas_id(self):
+        self._canvas_id_counter += 1
+        return self._canvas_id_counter - 1
+
+    def _generate_new_member_id(self):
+        self._member_id_counter += 1
+        return self._member_id_counter - 1
+
+    def check_canvas_possession_right(self, member: ConferenceMember) -> bool:
+        if member.role >= MemberRole.PARTICIPANT:
+            return True
+        return False
 
     def poke(self):
         self.last_activity = datetime.utcnow()
 
-    async def connect(
-        self, websocket: WebSocket, role: MemberRole = MemberRole.PARTICIPANT
-    ):
-        await websocket.accept()
-
-        if not self.connections:
-            role = max(role, MemberRole.OWNER)
-
-        user = ConferenceMember(websocket, len(self.connections), role)
-
-        if not self.owner:
-            self.owner = user
-
-        self.connections.append(user)
-        self.poke()
-
-        await user.send_json(
-            {"type": "welcome", "id": user.canvas_id, "role": user.role.value}
+    def new_canvas(self, owners=None, *, id: int = None):
+        if owners is None:
+            owners = []
+        if id is None:
+            id = self._generate_new_canvas_id()
+        canvas = Canvas(
+            id=self._generate_new_canvas_id(),
+            owners=owners,
+            conference=self,
         )
+        self.canvases[canvas.id] = canvas
+        return canvas
 
-        for other_user in self.connections:
-            if other_user.has_canvas():
-                await user.send_json(
-                    Action(other_user.canvas_id, other_user.canvas).to_json()
-                )
+    def new_member(self, role: MemberRole = MemberRole.PARTICIPANT):
+        member = ConferenceMember(self._generate_new_member_id(), role, conference=self)
+        self.members[member.id] = member
+        if self.check_canvas_possession_right(member):
+            canvas = self.new_canvas(
+                [member], id=member.id if self.sync_canvas_and_member_ids else None
+            )
+            member.set_canvas(canvas)
+        return member
 
-        await self.broadcast_update(
-            Action(user.canvas_id, user.canvas), exclude=(user,)
-        )
+    def get_member(self, id: int):
+        return self.members[id]
 
-        return user
+    def get_canvas(self, id: int):
+        return self.canvases[id]
 
     def is_active(self, timestamp: datetime = None) -> bool:
         if timestamp is None:
             timestamp = datetime.utcnow()
         return (
-            self.connections
+            self.members
             and (timestamp - self.last_activity).total_seconds()
             < CONFERENCE_EXPIRATION_TIME
         )
 
-    def disconnect(self, connection: ConferenceMember):
-        self.connections.remove(connection)
+    def get_all_members(self):
+        return list(self.members.values())
 
-    async def handle_action(self, action: Action, actor: ConferenceMember):
-        self.poke()
+    def iter_canvas_viewers(self, canvas: Canvas):
+        for member in self.iter_all_members():
+            if canvas.check_view_permission(member):
+                yield member
 
-        if not actor.can_do_anything():
-            return
-        if not actor.can_edit_canvas(action.target_canvas_id):
-            return
-
-        try:
-            self.connections[action.target_canvas_id].canvas = action.canvas_data
-        except IndexError:
-            return
-
-        await self.broadcast_update(action, exclude=(actor,))
-
-    async def broadcast_update(
-        self, action: Action, exclude: tuple[ConferenceMember] = None
-    ):
+    def iter_all_members(self, *, exclude: list[ConferenceMember] = None):
         if exclude is None:
-            exclude = set()
+            return self.members.values()
+        for member in self.members.values():
+            if member not in exclude:
+                yield member
 
-        for connection in self.connections:
-            if connection in exclude:
-                continue
-            await connection.send_json(action.to_json())
+    def iter_all_canvases(self, *, exclude: list[Canvas] = None):
+        if exclude is None:
+            return self.canvases.values()
+        for canvas in self.canvases.values():
+            if canvas not in exclude:
+                yield canvas
+
+    def write_canvas(
+        self,
+        sender: ConferenceMember,
+        canvas: Canvas,
+        new_data: CanvasData,
+        force: bool = False,
+    ):
+        if force or canvas.check_edit_permission(sender):
+            canvas.set_data(new_data)
+        else:
+            raise ForbiddenConferenceAction(
+                f"Member {sender.id} has no access to Canvas {canvas.id}"
+            )

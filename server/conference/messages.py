@@ -1,12 +1,14 @@
 import dataclasses
+from typing import TYPE_CHECKING, Iterable
 
-from server.conference.conference_session import ConferenceSession, ConferenceMember
-from server.conference.canvas import Canvas, CanvasData
+if TYPE_CHECKING:
+    from server.conference.conference_session import ConferenceSession, ConferenceMember
+    from server.conference.canvas import Canvas, CanvasData
 
 
 @dataclasses.dataclass
 class BaseConferenceMessage:
-    recievers: list[ConferenceMember] | None
+    recievers: Iterable[ConferenceMember] | None
     conference: ConferenceSession
 
 
