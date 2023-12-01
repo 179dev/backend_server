@@ -11,18 +11,18 @@ class CanvasData(str):
 
 
 class Canvas:
+    id: int
     data: CanvasData
     owners: list[ConferenceMember]
     conference: ConferenceSession
-    id: int
     visibility_role: MemberRole
     edition_role: MemberRole
 
     def __init__(
         self,
+        id: int,
         owners: list[ConferenceMember],
         conference: ConferenceSession,
-        id: int,
         visibility_role: MemberRole = MemberRole.ASSISTANT,
         edition_role: MemberRole = MemberRole.ASSISTANT,
     ) -> None:
