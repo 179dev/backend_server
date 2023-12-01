@@ -1,4 +1,10 @@
-from fastapi import WebSocket
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+from fastapi import WebSocket, WebSocketDisconnect
 
 from server.conference.exceptions import ForbiddenConferenceAction
 
@@ -7,6 +13,7 @@ from server.conference.conference_session import ConferenceSession, ConferenceMe
 from server.conference.constants import MemberRole
 from server.conference.messages import (
     BaseConferenceMessage,
+    BaseClientMessage,
     WriteCanvasMessage,
     SendFullCanvasMessage,
     MemberInfoMessage,
@@ -29,20 +36,26 @@ class ConferenceController:
         self.is_alive = True
         self.conference = conference
 
+    @property
+    def conference_id(self):
+        return self.conference.id
+
     async def broadcast_message(self, message: BaseConferenceMessage):
         encoded_message = self.message_coding.encode_message(message)
         for reciever in message.recievers:
             ws = self.get_connection(reciever.id)
             await ws.send_text(encoded_message)
 
-    async def on_connect(self, ws: WebSocket):
+    async def on_connect(self, ws: WebSocket) -> ConferenceMember:
         self.conference.poke()
         if self._is_owner_role_vacant:
             role = MemberRole.OWNER
         else:
             role = MemberRole.PARTICIPANT
+        new_member = self.conference.create_member(role)
+        if self._is_owner_role_vacant:
+            new_member.canvas.set_visibility_role(MemberRole.LISTENER)
         self._is_owner_role_vacant = False
-        new_member = self.conference.new_member(role)
         self.add_connection(new_member.id, websocket=ws)
         welcoming_message = MemberInfoMessage(
             recievers=(new_member,),  # NOTE: May change to iter_all_members()
@@ -65,6 +78,7 @@ class ConferenceController:
                 target_canvas=new_member.canvas,
             )
             await self.broadcast_message(my_canvas_message)
+        return new_member
 
     async def on_disconnect(self, member: ConferenceMember):
         self.conference.poke()
@@ -72,9 +86,8 @@ class ConferenceController:
         if not not self.conference.is_active():
             self.is_alive = False
 
-    async def on_message(self, data: str, sender: ConferenceMember):
+    async def on_message(self, message: BaseClientMessage):
         self.conference.poke()
-        message = self.message_coding.decode_message(data, sender=sender)
         match message:
             case WriteCanvasMessage():
                 try:
@@ -104,8 +117,23 @@ class ConferenceController:
         self._user_ws_table[user_id] = websocket
 
     def remove_connection(self, user_id: int):
-        self.close_connection(user_id)
         del self._user_ws_table[user_id]
 
     async def close_connection(self, user_id: int):
         await self._user_ws_table[user_id].close()
+
+    def should_be_terminated(self, timestamp: datetime | None = None) -> bool:
+        return not (self.is_alive and self.conference.is_active(timestamp))
+
+    async def run_connection_loop(self, websocket: WebSocket):
+        member = await self.on_connect(websocket)
+        try:
+            while True:
+                data = await websocket.receive_text()
+                message = self.message_coding.decode_message(
+                    message_str=data, sender=member
+                )
+                await self.on_message(message)
+        except WebSocketDisconnect:
+            await self.close_connection(member.id)
+            self.remove_connection(member.id)

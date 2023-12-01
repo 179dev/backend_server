@@ -1,12 +1,14 @@
+import abc
+
 from server.conference.messages import *
 from server.conference.conference_session import ConferenceMember
 
 
-class BaseMessageCoding:
-    @staticmethod
+class BaseMessageCoding(abc.ABC):
+    @abc.abstractstaticmethod
     def encode_message(message: BaseConferenceMessage) -> str:
         ...
 
-    @staticmethod
-    def decode_message(message: str, sender: ConferenceMember) -> BaseClientMessage:
+    @abc.abstractstaticmethod
+    def decode_message(message_str: str, sender: ConferenceMember) -> BaseClientMessage:
         ...

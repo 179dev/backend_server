@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from server.domains import users, conferences
-from server.conference import main_conference_sessions_pool
+from server.conference import main_conference_manager
 from server.debug import conference_debug
 from server.database.db_settings import Base, engine
 from server.config import ALLOWED_ORIGINS, DEBUG
@@ -14,7 +14,7 @@ Base.metadata.create_all(bind=engine)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # On startup:
-    await main_conference_sessions_pool.run_conference_expiration_cycle()
+    await main_conference_manager.run_conference_expiration_cycle()
     yield
     # On shutdown:
     ...

@@ -43,8 +43,8 @@ class ConferenceSession:
 
     def __init__(self, id: UUID):
         self.id = id
-        self.canvases = []
-        self.members = []
+        self.canvases = {}
+        self.members = {}
         self.owner = None
         self.sync_canvas_and_member_ids = CONFERENCE_SYNC_MEMBER_AND_CANVAS_IDS
         self.poke()
@@ -65,7 +65,7 @@ class ConferenceSession:
     def poke(self):
         self.last_activity = datetime.utcnow()
 
-    def new_canvas(self, owners=None, *, id: int = None):
+    def create_canvas(self, owners=None, *, id: int = None):
         if owners is None:
             owners = []
         if id is None:
@@ -78,11 +78,13 @@ class ConferenceSession:
         self.canvases[canvas.id] = canvas
         return canvas
 
-    def new_member(self, role: MemberRole = MemberRole.PARTICIPANT):
-        member = ConferenceMember(self._generate_new_member_id(), role, conference=self)
+    def create_member(self, role: MemberRole = MemberRole.PARTICIPANT):
+        member = ConferenceMember(
+            self._generate_new_member_id(), conference=self, role=role
+        )
         self.members[member.id] = member
         if self.check_canvas_possession_right(member):
-            canvas = self.new_canvas(
+            canvas = self.create_canvas(
                 [member], id=member.id if self.sync_canvas_and_member_ids else None
             )
             member.set_canvas(canvas)
@@ -113,14 +115,18 @@ class ConferenceSession:
 
     def iter_all_members(self, *, exclude: list[ConferenceMember] = None):
         if exclude is None:
-            return self.members.values()
+            for member in self.members.values():
+                yield member
+            return
         for member in self.members.values():
             if member not in exclude:
                 yield member
 
     def iter_all_canvases(self, *, exclude: list[Canvas] = None):
         if exclude is None:
-            return self.canvases.values()
+            for canvas in self.canvases.values():
+                yield canvas
+            return
         for canvas in self.canvases.values():
             if canvas not in exclude:
                 yield canvas

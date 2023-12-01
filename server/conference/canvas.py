@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -13,7 +14,7 @@ class CanvasData(str):
 class Canvas:
     id: int
     data: CanvasData
-    owners: list[ConferenceMember]
+    owners: list
     conference: ConferenceSession
     visibility_role: MemberRole
     edition_role: MemberRole
@@ -31,6 +32,12 @@ class Canvas:
         self.owners = owners
         self.id = id
         self.visibility_role = visibility_role
+        self.edition_role = edition_role
+
+    def set_visibility_role(self, visibility_role: MemberRole):
+        self.visibility_role = visibility_role
+
+    def set_edition_role(self, edition_role: MemberRole):
         self.edition_role = edition_role
 
     def check_edit_permission(self, member: ConferenceMember):

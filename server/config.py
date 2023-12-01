@@ -1,5 +1,4 @@
 import os
-import datetime
 
 # Env variables
 INNER_PORT = os.getenv("INNER_PORT")
@@ -10,9 +9,11 @@ POSTGRES_HOST = os.getenv("POSTGRES_HOST")
 POSTGRES_PORT = os.getenv("POSTGRES_PORT")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 DEBUG = os.getenv("DEBUG") != "false"
+
 CONFERENCE_SYNC_MEMBER_AND_CANVAS_IDS = (
     os.getenv("CONFERENCE_SYNC_MEMBER_AND_CANVAS_IDS") != "false"
 )
+CONFERENCE_MESSAGE_CONTRACT = os.getenv("CONFERENCE_MESSAGE_CONTRACT")
 
 CONFERENCE_EXPIRATION_TIME = (
     int(os.getenv("CONFERENCE_EXPIRATION_TIME"))

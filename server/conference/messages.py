@@ -1,9 +1,8 @@
 import dataclasses
-from typing import TYPE_CHECKING, Iterable
+from typing import Iterable
 
-if TYPE_CHECKING:
-    from server.conference.conference_session import ConferenceSession, ConferenceMember
-    from server.conference.canvas import Canvas, CanvasData
+from server.conference.conference_session import ConferenceSession, ConferenceMember
+from server.conference.canvas import Canvas, CanvasData
 
 
 @dataclasses.dataclass
