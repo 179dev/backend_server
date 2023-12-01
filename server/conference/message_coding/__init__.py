@@ -1,0 +1,1 @@
+from server.conference.message_coding.json_message_coding import JSONMessageCoding
