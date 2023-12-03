@@ -1,6 +1,4 @@
-from uuid import UUID, uuid4
 import datetime
-from typing import overload
 
 from server.conference.conference_session import ConferenceSession
 from server.conference.conference_controller import ConferenceController
@@ -8,19 +6,20 @@ from server.conference.exceptions import ConferenceNotFound
 from server.vendor.repeat_every import repeat_every
 from server.conference.message_coding.base_message_coder import BaseMessageCoder
 from server.config import CONFERENCE_GC_RATE
+from server.conference.types import ConferenceID
 
 
 class ConferenceManager:
-    _conferences: dict[UUID, ConferenceController]
+    _conferences: dict[ConferenceID, ConferenceController]
     message_coding: BaseMessageCoder
 
     def __init__(self, message_coding: BaseMessageCoder) -> None:
         self._conferences = {}
         self.message_coding = message_coding
 
-    def create_conference(self, id: UUID = None) -> ConferenceController:
+    def create_conference(self, id: ConferenceID = None) -> ConferenceController:
         if id is None:
-            id = uuid4()
+            id = ConferenceID()
 
         new_conference_session = ConferenceSession(id)
         conference_controller = ConferenceController(
@@ -31,32 +30,13 @@ class ConferenceManager:
 
         return conference_controller
 
-    @overload
-    def get_conference(self, id: str) -> ConferenceController:
-        ...
+    def get_conference(self, id: ConferenceID) -> ConferenceController:
+        try:
+            return self._conferences[id]
+        except KeyError:
+            raise ConferenceNotFound("Conference {id} does not exist")
 
-    @overload
-    def get_conference(self, id: UUID) -> ConferenceController:
-        ...
-
-    def get_conference(self, id: UUID | str) -> ConferenceController:
-        if isinstance(id, str):
-            id = UUID(id)
-        if id not in self._conferences:
-            raise ConferenceNotFound(f"Conference with ID {id} does not exist")
-        return self._conferences[id]
-
-    @overload
-    def terminate_conference(self, id: str):
-        ...
-
-    @overload
-    def terminate_conference(self, id: UUID):
-        ...
-
-    def terminate_conference(self, id: UUID | str):
-        if isinstance(id, str):
-            id = UUID(id)
+    def terminate_conference(self, id: ConferenceID):
         del self._conferences[id]
 
     async def run_conference_expiration_cycle(self):

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from datetime import datetime
+from uuid import UUID
+
 from server.conference.constants import MemberRole
 from server.config import (
     CONFERENCE_EXPIRATION_TIME,
@@ -7,19 +10,18 @@ from server.config import (
 )
 from server.conference.canvas import Canvas, CanvasData
 from server.conference.exceptions import ForbiddenConferenceAction
-from datetime import datetime
-from uuid import UUID
+from server.conference.types import MemberID
 
 
 class ConferenceMember:
     role: MemberRole
-    id: int
+    id: MemberID
     conference: ConferenceSession
     canvas: Canvas | None = None
 
     def __init__(
         self,
-        id: int,
+        id: MemberID,
         conference: ConferenceSession,
         role: MemberRole = MemberRole.PARTICIPANT,
     ) -> None:
@@ -33,12 +35,12 @@ class ConferenceMember:
 
 class ConferenceSession:
     canvases: dict[int, Canvas]
-    members: dict[int, ConferenceMember]
+    members: dict[MemberID, ConferenceMember]
     owner: ConferenceMember | None
     last_activity: datetime
     id: UUID
     _canvas_id_counter: int = 0
-    _member_id_counter: int = 0
+    _member_id_counter: MemberID = 0
     sync_canvas_and_member_ids: bool
 
     def __init__(self, id: UUID):
@@ -57,7 +59,7 @@ class ConferenceSession:
         self._member_id_counter += 1
         return self._member_id_counter - 1
 
-    def check_canvas_possession_right(self, member: ConferenceMember) -> bool:
+    def check_canvas_owning_right(self, member: ConferenceMember) -> bool:
         if member.role >= MemberRole.PARTICIPANT:
             return True
         return False
@@ -83,7 +85,7 @@ class ConferenceSession:
             self._generate_new_member_id(), conference=self, role=role
         )
         self.members[member.id] = member
-        if self.check_canvas_possession_right(member):
+        if self.check_canvas_owning_right(member):
             canvas = self.create_canvas(
                 [member], id=member.id if self.sync_canvas_and_member_ids else None
             )
