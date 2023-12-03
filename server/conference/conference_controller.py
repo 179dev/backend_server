@@ -18,7 +18,7 @@ from server.conference.messages import (
     BaseConferenceMessage,
     BaseClientMessage,
     WriteCanvasMessage,
-    SendFullCanvasMessage,
+    FullCanvasMessage,
     MemberInfoMessage,
 )
 
@@ -70,7 +70,7 @@ class ConferenceController:
 
         for canvas in self.conference.iter_all_canvases():
             if canvas.check_view_permission(member=new_member):
-                canvas_message = SendFullCanvasMessage(
+                canvas_message = FullCanvasMessage(
                     recievers=(new_member,),
                     conference=self.conference,
                     target_canvas=canvas,
@@ -78,7 +78,7 @@ class ConferenceController:
                 await self.broadcast_message(canvas_message)
 
         if self.conference.check_canvas_possession_right(new_member):
-            my_canvas_message = SendFullCanvasMessage(
+            my_canvas_message = FullCanvasMessage(
                 recievers=self.conference.iter_all_members(exclude=[new_member]),
                 conference=self.conference,
                 target_canvas=new_member.canvas,
@@ -106,7 +106,7 @@ class ConferenceController:
                 except ForbiddenConferenceAction:
                     # Handle forbidden action
                     return
-                response_message = SendFullCanvasMessage(
+                response_message = FullCanvasMessage(
                     recievers=self.conference.iter_canvas_viewers(
                         message.target_canvas
                     ),

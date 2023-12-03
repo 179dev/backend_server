@@ -11,7 +11,7 @@ class JSONMessageCoder(BaseMessageCoder):
     def encode_message(message: BaseConferenceMessage) -> str:
         message_dict = {}
         match message:
-            case SendFullCanvasMessage():
+            case FullCanvasMessage():
                 message_dict["type"] = "broadcast"
                 message_dict["target"] = message.target_canvas.id
                 message_dict["drawing"] = message.target_canvas.get_data()

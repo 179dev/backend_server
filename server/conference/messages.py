@@ -12,7 +12,7 @@ class BaseConferenceMessage:
 
 
 @dataclasses.dataclass
-class SendFullCanvasMessage(BaseConferenceMessage):
+class FullCanvasMessage(BaseConferenceMessage):
     target_canvas: Canvas
 
 
