@@ -49,6 +49,7 @@ class ConferenceController:
 
     async def on_connect(self, ws: WebSocket) -> ConferenceMember:
         self.conference.poke()
+
         if self.is_owner_role_vacant:
             role = MemberRole.OWNER
         else:
@@ -57,13 +58,16 @@ class ConferenceController:
         if self.is_owner_role_vacant:
             new_member.canvas.set_visibility_role(MemberRole.LISTENER)
         self.is_owner_role_vacant = False
+
         self.add_connection(new_member.id, websocket=ws)
+
         welcoming_message = MemberInfoMessage(
             recievers=(new_member,),  # NOTE: May change to iter_all_members()
             conference=self.conference,
             member=new_member,
         )
         await self.broadcast_message(welcoming_message)
+
         for canvas in self.conference.iter_all_canvases():
             if canvas.check_view_permission(member=new_member):
                 canvas_message = SendFullCanvasMessage(
@@ -72,6 +76,7 @@ class ConferenceController:
                     target_canvas=canvas,
                 )
                 await self.broadcast_message(canvas_message)
+
         if self.conference.check_canvas_possession_right(new_member):
             my_canvas_message = SendFullCanvasMessage(
                 recievers=self.conference.iter_all_members(exclude=[new_member]),
@@ -79,6 +84,7 @@ class ConferenceController:
                 target_canvas=new_member.canvas,
             )
             await self.broadcast_message(my_canvas_message)
+
         return new_member
 
     async def on_disconnect(self, member: ConferenceMember):
