@@ -26,14 +26,14 @@ from server.conference.messages import (
 class ConferenceController:
     conference: ConferenceSession
     message_coding: BaseMessageCoder
-    _user_ws_table: dict[int, WebSocket]
-    _is_owner_role_vacant: bool
+    __user_ws_table: dict[int, WebSocket]
+    is_owner_role_vacant: bool
     is_alive: bool
 
     def __init__(self, message_coding: BaseMessageCoder, conference: ConferenceSession):
         self.message_coding = message_coding
-        self._user_ws_table = {}
-        self._is_owner_role_vacant = True
+        self.__user_ws_table = {}
+        self.is_owner_role_vacant = True
         self.is_alive = True
         self.conference = conference
 
@@ -49,14 +49,14 @@ class ConferenceController:
 
     async def on_connect(self, ws: WebSocket) -> ConferenceMember:
         self.conference.poke()
-        if self._is_owner_role_vacant:
+        if self.is_owner_role_vacant:
             role = MemberRole.OWNER
         else:
             role = MemberRole.PARTICIPANT
         new_member = self.conference.create_member(role)
-        if self._is_owner_role_vacant:
+        if self.is_owner_role_vacant:
             new_member.canvas.set_visibility_role(MemberRole.LISTENER)
-        self._is_owner_role_vacant = False
+        self.is_owner_role_vacant = False
         self.add_connection(new_member.id, websocket=ws)
         welcoming_message = MemberInfoMessage(
             recievers=(new_member,),  # NOTE: May change to iter_all_members()
@@ -112,16 +112,16 @@ class ConferenceController:
                 pass
 
     def get_connection(self, user_id: int):
-        return self._user_ws_table[user_id]
+        return self.__user_ws_table[user_id]
 
     def add_connection(self, user_id: int, websocket: WebSocket):
-        self._user_ws_table[user_id] = websocket
+        self.__user_ws_table[user_id] = websocket
 
     def remove_connection(self, user_id: int):
-        del self._user_ws_table[user_id]
+        del self.__user_ws_table[user_id]
 
     async def close_connection(self, user_id: int):
-        await self._user_ws_table[user_id].close()
+        await self.__user_ws_table[user_id].close()
 
     def should_be_terminated(self, timestamp: datetime | None = None) -> bool:
         return not (self.is_alive and self.conference.is_active(timestamp))
