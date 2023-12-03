@@ -4,7 +4,7 @@ from server.conference.messages import *
 from server.conference.conference_session import ConferenceMember
 
 
-class BaseMessageCoding(abc.ABC):
+class BaseMessageCoder(abc.ABC):
     @abc.abstractstaticmethod
     def encode_message(message: BaseConferenceMessage) -> str:
         ...

@@ -11,7 +11,7 @@ from server.conference.exceptions import (
     ConferenceValidationError,
 )
 
-from server.conference.message_coding.base_message_coding import BaseMessageCoding
+from server.conference.message_coding.base_message_coder import BaseMessageCoder
 from server.conference.conference_session import ConferenceSession, ConferenceMember
 from server.conference.constants import MemberRole
 from server.conference.messages import (
@@ -25,14 +25,12 @@ from server.conference.messages import (
 
 class ConferenceController:
     conference: ConferenceSession
-    message_coding: BaseMessageCoding
+    message_coding: BaseMessageCoder
     _user_ws_table: dict[int, WebSocket]
     _is_owner_role_vacant: bool
     is_alive: bool
 
-    def __init__(
-        self, message_coding: BaseMessageCoding, conference: ConferenceSession
-    ):
+    def __init__(self, message_coding: BaseMessageCoder, conference: ConferenceSession):
         self.message_coding = message_coding
         self._user_ws_table = {}
         self._is_owner_role_vacant = True

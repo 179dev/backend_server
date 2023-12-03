@@ -1,12 +1,12 @@
 import json
 
-from server.conference.message_coding.base_message_coding import BaseMessageCoding
+from server.conference.message_coding.base_message_coder import BaseMessageCoder
 from server.conference.messages import *
 from server.conference.conference_session import ConferenceMember
 from server.conference.exceptions import ConferenceValidationError
 
 
-class JSONMessageCoding(BaseMessageCoding):
+class JSONMessageCoder(BaseMessageCoder):
     @staticmethod
     def encode_message(message: BaseConferenceMessage) -> str:
         message_dict = {}

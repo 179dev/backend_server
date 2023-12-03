@@ -6,15 +6,15 @@ from server.conference.conference_session import ConferenceSession
 from server.conference.conference_controller import ConferenceController
 from server.conference.exceptions import ConferenceNotFound
 from server.vendor.repeat_every import repeat_every
-from server.conference.message_coding.base_message_coding import BaseMessageCoding
+from server.conference.message_coding.base_message_coder import BaseMessageCoder
 from server.config import CONFERENCE_GC_RATE
 
 
 class ConferenceManager:
     _conferences: dict[UUID, ConferenceController]
-    message_coding: BaseMessageCoding
+    message_coding: BaseMessageCoder
 
-    def __init__(self, message_coding: BaseMessageCoding) -> None:
+    def __init__(self, message_coding: BaseMessageCoder) -> None:
         self._conferences = {}
         self.message_coding = message_coding
 
