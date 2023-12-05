@@ -111,7 +111,10 @@ class ConferenceController:
                     return
                 response_message = FullCanvasMessage(
                     recievers=self.conference.iter_canvas_viewers(
-                        message.target_canvas
+                        message.target_canvas,
+                        exclude=[
+                            message.sender,
+                        ],
                     ),
                     conference=self.conference,
                     target_canvas=message.target_canvas,
