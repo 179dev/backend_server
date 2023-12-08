@@ -15,8 +15,10 @@ def get_conferences_pool():
     return main_conferences_pool
 
 
-@router.post("/conference/")
-async def post(conferences_pool: ConferencesPool = Depends(get_conferences_pool)):
+@router.post("/create_conference/")
+async def create_conference(
+    conferences_pool: ConferencesPool = Depends(get_conferences_pool),
+):
     global _id
     conference_controller = conferences_pool.create_conference()
     _id = conference_controller.conference_id
