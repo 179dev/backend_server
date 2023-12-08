@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from datetime import datetime
 
 from server.conference.exceptions import (
-    ForbiddenConferenceAction,
+    ForbiddenConferenceActionError,
     ConferenceValidationError,
 )
 
@@ -106,7 +106,7 @@ class ConferenceController:
                         canvas=message.target_canvas,
                         new_data=message.data_override,
                     )
-                except ForbiddenConferenceAction:
+                except ForbiddenConferenceActionError:
                     # TODO: Handle forbidden action
                     return
                 response_message = FullCanvasMessage(

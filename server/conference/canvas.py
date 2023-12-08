@@ -1,10 +1,12 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from server.conference.conference_session import ConferenceMember, ConferenceSession
-
 from server.conference.constants import MemberRole
+from server.conference.types import MemberID, CanvasID, ConferenceID
+
+if TYPE_CHECKING:
+    from server.conference.conference_session import ConferenceMember
 
 
 class CanvasData(str):
@@ -12,24 +14,24 @@ class CanvasData(str):
 
 
 class Canvas:
-    id: int
+    id: CanvasID
     data: CanvasData
-    owners: list
-    conference: ConferenceSession
+    owners_id: list[MemberID]
+    conference_id: ConferenceID
     visibility_role: MemberRole
     edition_role: MemberRole
 
     def __init__(
         self,
-        id: int,
-        owners: list[ConferenceMember],
-        conference: ConferenceSession,
+        id: CanvasID,
+        owners_id: list[MemberID],
+        conference_id: ConferenceID,
         visibility_role: MemberRole = MemberRole.ASSISTANT,
         edition_role: MemberRole = MemberRole.ASSISTANT,
     ) -> None:
         self.data = CanvasData("")
-        self.conference = conference
-        self.owners = owners
+        self.conference_id = conference_id
+        self.owners_id = owners_id
         self.id = id
         self.visibility_role = visibility_role
         self.edition_role = edition_role
@@ -43,14 +45,14 @@ class Canvas:
     def check_edit_permission(self, member: ConferenceMember):
         if member.role >= self.edition_role:
             return True
-        if member in self.owners:
+        if member.id in self.owners_id:
             return True
         return False
 
     def check_view_permission(self, member: ConferenceMember):
         if member.role >= self.visibility_role:
             return True
-        if member in self.owners:
+        if member.id in self.owners_id:
             return True
         return False
 

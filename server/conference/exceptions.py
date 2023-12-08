@@ -6,7 +6,7 @@ class ConferenceControllerError(Exception):
     pass
 
 
-class ForbiddenConferenceAction(Exception):
+class ForbiddenConferenceActionError(Exception):
     pass
 
 

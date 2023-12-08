@@ -7,6 +7,7 @@ class CanvasData(str):
 
 
 MemberID = NewType("MemberID", int)
+CanvasID = NewType("CanvasID", int)
 
 
 class ConferenceID:
