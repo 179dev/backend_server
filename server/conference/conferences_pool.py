@@ -5,23 +5,39 @@ from server.conference.conference_controller import ConferenceController
 from server.conference.exceptions import ConferenceNotFound
 from server.vendor.repeat_every import repeat_every
 from server.conference.message_coding.base_message_coder import BaseMessageCoder
-from server.config import CONFERENCE_GC_RATE
 from server.conference.types import ConferenceID
 
 
 class ConferencesPool:
     _conferences: dict[ConferenceID, ConferenceController]
     message_coding: BaseMessageCoder
+    gc_check_rate: int
+    sync_canvas_and_member_ids: bool
+    expiration_time_limit: int
 
-    def __init__(self, message_coding: BaseMessageCoder) -> None:
+    def __init__(
+        self,
+        message_coding: BaseMessageCoder,
+        *,
+        gc_check_rate: int = 60 * 60,
+        sync_canvas_and_member_ids: bool = False,
+        expiration_time_limit: int = 2 * 60 * 60
+    ) -> None:
         self._conferences = {}
         self.message_coding = message_coding
+        self.gc_check_rate = gc_check_rate
+        self.sync_canvas_and_member_ids = sync_canvas_and_member_ids
+        self.expiration_time_limit = expiration_time_limit
 
     def create_conference(self, id: ConferenceID = None) -> ConferenceController:
         if id is None:
             id = ConferenceID()
 
-        new_conference = Conference(id)
+        new_conference = Conference(
+            id=id,
+            sync_canvas_and_member_ids=self.sync_canvas_and_member_ids,
+            expiration_time_limit=self.expiration_time_limit,
+        )
         conference_controller = ConferenceController(
             conference=new_conference, message_coding=self.message_coding
         )
@@ -40,7 +56,7 @@ class ConferencesPool:
         del self._conferences[id]
 
     async def run_conference_expiration_cycle(self):
-        @repeat_every(seconds=CONFERENCE_GC_RATE)
+        @repeat_every(seconds=self.gc_check_rate)
         def loop():
             for cid, conference in self._conferences.items():
                 timestamp = datetime.datetime.utcnow()

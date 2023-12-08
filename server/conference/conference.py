@@ -4,13 +4,9 @@ from datetime import datetime
 from uuid import UUID
 
 from server.conference.constants import MemberRole
-from server.config import (
-    CONFERENCE_EXPIRATION_TIME,
-    CONFERENCE_SYNC_MEMBER_AND_CANVAS_IDS,
-)
 from server.conference.canvas import Canvas, CanvasData
 from server.conference.exceptions import ForbiddenConferenceActionError
-from server.conference.types import MemberID, ConferenceID
+from server.conference.types import MemberID, ConferenceID, CanvasID
 
 
 class ConferenceMember:
@@ -34,28 +30,36 @@ class ConferenceMember:
 
 
 class Conference:
-    canvases: dict[int, Canvas]
+    canvases: dict[CanvasID, Canvas]
     members: dict[MemberID, ConferenceMember]
     owner: ConferenceMember | None
     last_activity: datetime
     id: ConferenceID
-    _canvas_id_counter: int = 0
+    _canvas_id_counter: CanvasID = 0
     _member_id_counter: MemberID = 0
     sync_canvas_and_member_ids: bool
+    expiration_time_limit: int
 
-    def __init__(self, id: ConferenceID):
+    def __init__(
+        self,
+        id: ConferenceID,
+        *,
+        sync_canvas_and_member_ids: bool = False,
+        expiration_time_limit: int = 2 * 60 * 60,
+    ):
         self.id = id
         self.canvases = {}
         self.members = {}
         self.owner = None
-        self.sync_canvas_and_member_ids = CONFERENCE_SYNC_MEMBER_AND_CANVAS_IDS
+        self.sync_canvas_and_member_ids = sync_canvas_and_member_ids
+        self.expiration_time_limit = expiration_time_limit
         self.poke()
 
-    def _generate_new_canvas_id(self):
+    def _generate_new_canvas_id(self) -> CanvasID:
         self._canvas_id_counter += 1
         return self._canvas_id_counter - 1
 
-    def _generate_new_member_id(self):
+    def _generate_new_member_id(self) -> MemberID:
         self._member_id_counter += 1
         return self._member_id_counter - 1
 
@@ -103,7 +107,7 @@ class Conference:
         return (
             self.members
             and (timestamp - self.last_activity).total_seconds()
-            < CONFERENCE_EXPIRATION_TIME
+            < self.expiration_time_limit
         )
 
     def get_all_members(self):

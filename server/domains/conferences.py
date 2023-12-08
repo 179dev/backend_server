@@ -15,7 +15,7 @@ def get_conferences_pool():
     return main_conferences_pool
 
 
-@router.post("/create_conference/")
+@router.post("/conference/")
 async def create_conference(
     conferences_pool: ConferencesPool = Depends(get_conferences_pool),
 ):
