@@ -71,7 +71,7 @@ class ConferenceController:
         )
         await self.broadcast_message(welcoming_message)
 
-        for canvas in self.conference.iter_all_canvases():
+        for canvas in self.conference.canvases.iter_all_canvases():
             if canvas.check_view_permission(member=new_member):
                 canvas_message = FullCanvasMessage(
                     recievers=(new_member,),
@@ -82,7 +82,9 @@ class ConferenceController:
 
         if self.conference.check_canvas_owning_right(new_member):
             my_canvas_message = FullCanvasMessage(
-                recievers=self.conference.iter_all_members(exclude=[new_member]),
+                recievers=self.conference.members.iter_all_members(
+                    exclude=[new_member]
+                ),
                 conference=self.conference,
                 target_canvas=new_member.canvas,
             )

@@ -1,37 +1,17 @@
 from __future__ import annotations
 
 from datetime import datetime
-from uuid import UUID
 
 from server.conference.constants import MemberRole
-from server.conference.canvas import Canvas, CanvasData
 from server.conference.exceptions import ForbiddenConferenceActionError
-from server.conference.types import MemberID, ConferenceID, CanvasID
-
-
-class ConferenceMember:
-    role: MemberRole
-    id: MemberID
-    conference_id: ConferenceID
-    canvas: Canvas | None = None
-
-    def __init__(
-        self,
-        id: MemberID,
-        conference_id: ConferenceID,
-        role: MemberRole = MemberRole.PARTICIPANT,
-    ) -> None:
-        self.role = role
-        self.id = id
-        self.conference_id = conference_id
-
-    def set_canvas(self, canvas: Canvas):
-        self.canvas = canvas
+from server.conference.types import MemberID, ConferenceID, CanvasID, CanvasData
+from server.conference.member import ConferenceMember, ConferenceMembers
+from server.conference.canvas import Canvas, Canvases
 
 
 class Conference:
-    canvases: dict[CanvasID, Canvas]
-    members: dict[MemberID, ConferenceMember]
+    canvases: Canvases
+    members: ConferenceMembers
     owner: ConferenceMember | None
     last_activity: datetime
     id: ConferenceID
@@ -48,8 +28,8 @@ class Conference:
         expiration_time_limit: int = 2 * 60 * 60,
     ):
         self.id = id
-        self.canvases = {}
-        self.members = {}
+        self.canvases = Canvases()
+        self.members = ConferenceMembers()
         self.owner = None
         self.sync_canvas_and_member_ids = sync_canvas_and_member_ids
         self.expiration_time_limit = expiration_time_limit
@@ -79,14 +59,14 @@ class Conference:
             owners_id=owners_id,
             conference_id=self.id,
         )
-        self.canvases[canvas.id] = canvas
+        self.canvases.add_canvas(canvas)
         return canvas
 
     def create_member(self, role: MemberRole = MemberRole.PARTICIPANT):
         member = ConferenceMember(
             self._generate_new_member_id(), conference_id=self.id, role=role
         )
-        self.members[member.id] = member
+        self.members.add_member(member)
         if self.check_canvas_owning_right(member):
             canvas = self.create_canvas(
                 owners_id=[member.id],
@@ -95,50 +75,23 @@ class Conference:
             member.set_canvas(canvas)
         return member
 
-    def get_member(self, id: MemberID):
-        return self.members[id]
-
-    def get_canvas(self, id: int):
-        return self.canvases[id]
-
     def is_active(self, timestamp: datetime = None) -> bool:
         if timestamp is None:
             timestamp = datetime.utcnow()
         return (
-            self.members
+            not self.members.is_empty
             and (timestamp - self.last_activity).total_seconds()
             < self.expiration_time_limit
         )
-
-    def get_all_members(self):
-        return list(self.members.values())
 
     def iter_canvas_viewers(
         self, canvas: Canvas, *, exclude: list[ConferenceMember] = None
     ):
         if exclude is None:
             exclude = []
-        for member in self.iter_all_members():
+        for member in self.members.iter_all_members():
             if canvas.check_view_permission(member) and member not in exclude:
                 yield member
-
-    def iter_all_members(self, *, exclude: list[ConferenceMember] = None):
-        if exclude is None:
-            for member in self.members.values():
-                yield member
-            return
-        for member in self.members.values():
-            if member not in exclude:
-                yield member
-
-    def iter_all_canvases(self, *, exclude: list[Canvas] = None):
-        if exclude is None:
-            for canvas in self.canvases.values():
-                yield canvas
-            return
-        for canvas in self.canvases.values():
-            if canvas not in exclude:
-                yield canvas
 
     def write_canvas(
         self,

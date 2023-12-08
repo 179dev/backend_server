@@ -43,7 +43,9 @@ class JSONMessageCoder(BaseMessageCoder):
             case {"target": int(), "drawing": str()}:
                 message = WriteCanvasMessage(
                     sender=sender,
-                    target_canvas=conference.get_canvas(message_dict["target"]),
+                    target_canvas=conference.canvases.get_canvas(
+                        message_dict["target"]
+                    ),
                     data_override=CanvasData(message_dict["drawing"]),
                 )
                 return message

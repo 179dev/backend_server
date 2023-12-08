@@ -3,14 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from server.conference.constants import MemberRole
-from server.conference.types import MemberID, CanvasID, ConferenceID
+from server.conference.types import MemberID, CanvasID, ConferenceID, CanvasData
 
 if TYPE_CHECKING:
     from server.conference.conference import ConferenceMember
-
-
-class CanvasData(str):
-    ...
 
 
 class Canvas:
@@ -61,3 +57,36 @@ class Canvas:
 
     def get_data(self):
         return self.data
+
+
+class Canvases:
+    _collection: dict[CanvasID, Canvas]
+
+    def __init__(self) -> None:
+        self._collection = {}
+
+    def get_canvas(self, id: CanvasID):
+        return self._collection[id]
+
+    def add_canvas(self, canvas: Canvas):
+        self._collection[canvas.id] = canvas
+        return canvas
+
+    def remove_canvas(self, id: CanvasID):
+        del self._collection[id]
+
+    def get_all_canvases(self):
+        return list(self._collection.values())
+
+    def iter_all_canvases(self, *, exclude: list[CanvasID] = None):
+        if exclude is None:
+            for canvas in self._collection.values():
+                yield canvas
+            return
+        for canvas in self._collection.values():
+            if canvas not in exclude:
+                yield canvas
+
+    @property
+    def is_empty(self):
+        return bool(self._collection)
