@@ -108,9 +108,13 @@ class ConferenceSession:
     def get_all_members(self):
         return list(self.members.values())
 
-    def iter_canvas_viewers(self, canvas: Canvas):
+    def iter_canvas_viewers(
+        self, canvas: Canvas, *, exclude: list[ConferenceMember] = None
+    ):
+        if exclude is None:
+            exclude = []
         for member in self.iter_all_members():
-            if canvas.check_view_permission(member):
+            if canvas.check_view_permission(member) and member not in exclude:
                 yield member
 
     def iter_all_members(self, *, exclude: list[ConferenceMember] = None):
