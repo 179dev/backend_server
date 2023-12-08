@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 import abc
+from typing import TYPE_CHECKING
 
 from server.conference.messages import *
-from server.conference.conference_session import ConferenceMember
-from server.conference.conference_manager import ConferenceManager
+from server.conference.conference import ConferenceMember
+
+if TYPE_CHECKING:
+    from server.conference.conference import Conference
 
 
 class BaseMessageCoder(abc.ABC):
@@ -14,6 +19,6 @@ class BaseMessageCoder(abc.ABC):
     def decode_message(
         message_str: str,
         sender: ConferenceMember,
-        conference_manager: ConferenceManager,
+        conference: Conference,
     ) -> BaseClientMessage:
         ...

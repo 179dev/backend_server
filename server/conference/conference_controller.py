@@ -10,7 +10,7 @@ from server.conference.exceptions import (
 )
 
 from server.conference.message_coding.base_message_coder import BaseMessageCoder
-from server.conference.conference_session import ConferenceSession, ConferenceMember
+from server.conference.conference import Conference, ConferenceMember
 from server.conference.constants import MemberRole
 from server.conference.member_connections import (
     MemberConnectionsPool,
@@ -27,13 +27,13 @@ from server.conference.messages import (
 
 
 class ConferenceController:
-    conference: ConferenceSession
+    conference: Conference
     message_coding: BaseMessageCoder
     connections_pool: MemberConnectionsPool
     is_owner_role_vacant: bool
     is_alive: bool
 
-    def __init__(self, message_coding: BaseMessageCoder, conference: ConferenceSession):
+    def __init__(self, message_coding: BaseMessageCoder, conference: Conference):
         self.message_coding = message_coding
         self.connections_pool = MemberConnectionsPool()
         self.is_owner_role_vacant = True
@@ -133,7 +133,7 @@ class ConferenceController:
                 data = await connection.receive_text()
                 try:
                     message = self.message_coding.decode_message(
-                        message_str=data, sender=member
+                        message_str=data, sender=member, conference=self.conference
                     )
                     await self.on_message(message)
                 except ConferenceValidationError:

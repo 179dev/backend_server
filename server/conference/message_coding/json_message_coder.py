@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 import json
+from typing import TYPE_CHECKING
 
 from server.conference.message_coding.base_message_coder import BaseMessageCoder
-from server.conference.messages import *
-from server.conference.conference_session import ConferenceMember
 from server.conference.exceptions import ConferenceValidationError
-from server.conference.conference_manager import ConferenceManager
+from server.conference.messages import *
+from server.conference.conference import ConferenceMember
+
+if TYPE_CHECKING:
+    from server.conference.conference import Conference
 
 
 class JSONMessageCoder(BaseMessageCoder):
@@ -28,7 +33,7 @@ class JSONMessageCoder(BaseMessageCoder):
     def decode_message(
         message_str: str,
         sender: ConferenceMember,
-        conference_manager: ConferenceManager,
+        conference: Conference,
     ) -> BaseClientMessage:
         try:
             message_dict = json.loads(message_str)
@@ -36,12 +41,9 @@ class JSONMessageCoder(BaseMessageCoder):
             raise ConferenceValidationError("Message is not JSON")
         match message_dict:
             case {"target": int(), "drawing": str()}:
-                conference = conference_manager.get_conference(sender.conference_id)
                 message = WriteCanvasMessage(
                     sender=sender,
-                    target_canvas=conference.conference.get_canvas(
-                        message_dict["target"]
-                    ),
+                    target_canvas=conference.get_canvas(message_dict["target"]),
                     data_override=CanvasData(message_dict["drawing"]),
                 )
                 return message

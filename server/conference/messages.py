@@ -1,14 +1,14 @@
 import dataclasses
 from typing import Iterable
 
-from server.conference.conference_session import ConferenceSession, ConferenceMember
+from server.conference.conference import Conference, ConferenceMember
 from server.conference.canvas import Canvas, CanvasData
 
 
 @dataclasses.dataclass
 class BaseConferenceMessage:
     recievers: Iterable[ConferenceMember] | None
-    conference: ConferenceSession
+    conference: Conference
 
 
 @dataclasses.dataclass

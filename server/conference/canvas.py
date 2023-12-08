@@ -6,7 +6,7 @@ from server.conference.constants import MemberRole
 from server.conference.types import MemberID, CanvasID, ConferenceID
 
 if TYPE_CHECKING:
-    from server.conference.conference_session import ConferenceMember
+    from server.conference.conference import ConferenceMember
 
 
 class CanvasData(str):
