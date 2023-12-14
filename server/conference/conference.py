@@ -19,6 +19,7 @@ class Conference:
     _member_id_counter: MemberID = 0
     sync_canvas_and_member_ids: bool
     expiration_time_limit: int
+    is_user_counter_frozen: bool
 
     def __init__(
         self,
@@ -33,6 +34,7 @@ class Conference:
         self.owner = None
         self.sync_canvas_and_member_ids = sync_canvas_and_member_ids
         self.expiration_time_limit = expiration_time_limit
+        self.is_user_counter_frozen = True
         self.poke()
 
     def _generate_new_canvas_id(self) -> CanvasID:
@@ -63,6 +65,7 @@ class Conference:
         return canvas
 
     def create_member(self, role: MemberRole = MemberRole.PARTICIPANT):
+        self.is_user_counter_frozen = False
         member = ConferenceMember(
             self._generate_new_member_id(), conference_id=self.id, role=role
         )
@@ -79,7 +82,7 @@ class Conference:
         if timestamp is None:
             timestamp = datetime.utcnow()
         return (
-            not self.members.is_empty
+            not ((not self.is_user_counter_frozen) and self.members.is_empty)
             and (timestamp - self.last_activity).total_seconds()
             < self.expiration_time_limit
         )
