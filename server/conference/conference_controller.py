@@ -48,7 +48,8 @@ class ConferenceController:
         encoded_message = self.message_coding.encode_message(message)
         for reciever in message.recievers:
             connection = self.connections_pool.get_connection(reciever.id)
-            await connection.send_text(encoded_message)
+            if connection is not None:
+                await connection.send_text(encoded_message)
 
     async def on_connect(self, connection: BaseMemberConnection) -> ConferenceMember:
         self.conference.poke()
@@ -95,6 +96,7 @@ class ConferenceController:
     async def on_disconnect(self, member: ConferenceMember):
         self.conference.poke()
         self.connections_pool.remove_connection(member.id)
+        self.conference.members.remove_member(member.id)
         if not self.conference.is_active():
             self.is_alive = False
 

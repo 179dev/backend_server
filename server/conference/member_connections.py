@@ -56,7 +56,7 @@ class MemberConnectionsPool:
         self.__connections_table = {}
 
     def get_connection(self, id: MemberID) -> BaseMemberConnection:
-        return self.__connections_table[id]
+        return self.__connections_table[id] if id in self.__connections_table else None
 
     def add_connection(
         self, id: MemberID, connection: BaseMemberConnection
