@@ -28,9 +28,7 @@ def create_user(user: UserCreate, db: DBContext = Depends(db_context)):
 
 
 @router.get("/users/", response_model=list[UserGet])
-def read_users(
-    skip: int = 0, limit: int = 100, ctx: DBContext = Depends(db_context)
-):
+def read_users(skip: int = 0, limit: int = 100, ctx: DBContext = Depends(db_context)):
     return list(main_repo.users.every(ctx, skip=skip, limit=limit))
 
 
